@@ -1,1 +1,9 @@
-<router-outlet></router-outlet>
+<div class="min-h-screen flex flex-col bg-[#0D0E12]">
+  <!-- A barra de navegação no topo -->
+  <app-navbar></app-navbar>
+
+  <!-- O conteúdo da página ocupando o restante da tela -->
+  <main class="flex-1 w-full max-w-[1440px] mx-auto overflow-y-auto">
+    <router-outlet></router-outlet>
+  </main>
+</div>
