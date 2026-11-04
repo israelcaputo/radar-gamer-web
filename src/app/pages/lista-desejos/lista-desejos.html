@@ -1,0 +1,164 @@
+<div class="max-w-7xl mx-auto px-6 py-8">
+  <p class="text-radar-green text-xs font-bold tracking-widest uppercase mb-2">
+    Sua próxima conquista
+  </p>
+  <div class="flex justify-between items-end mb-8">
+    <div>
+      <h1 class="text-4xl font-bold mb-2">Lista de desejos</h1>
+      <p class="text-radar-text-muted text-sm">Guarde seus favoritos. Compare antes de comprar.</p>
+    </div>
+    <button
+      class="bg-radar-green hover:bg-radar-green-hover text-radar-bg font-bold px-6 py-3 rounded-lg flex items-center gap-2 transition-colors"
+    >
+      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          stroke-width="2"
+          d="M12 4v16m8-8H4"
+        ></path>
+      </svg>
+      Adicionar jogo
+    </button>
+  </div>
+
+  <!-- Cards de Estatísticas -->
+  <div class="grid grid-cols-4 gap-6 mb-8 border-b border-radar-border pb-8">
+    <div class="bg-radar-surface border border-radar-border rounded-xl p-5 flex items-center gap-4">
+      <span class="text-3xl font-bold text-radar-green">04</span>
+      <span class="text-sm text-radar-text-muted">jogos salvos</span>
+    </div>
+    <div class="bg-radar-surface border border-radar-border rounded-xl p-5 flex items-center gap-4">
+      <span class="text-3xl font-bold text-radar-green">04</span>
+      <span class="text-sm text-radar-text-muted">em promoção</span>
+    </div>
+    <div class="bg-radar-surface border border-radar-border rounded-xl p-5 flex items-center gap-4">
+      <span class="text-3xl font-bold text-radar-green">01</span>
+      <span class="text-sm text-radar-text-muted">meta de alerta atingida</span>
+    </div>
+    <div
+      class="bg-radar-surface border border-radar-border rounded-xl p-5 flex items-center justify-between"
+    >
+      <span class="text-2xl font-bold text-radar-green">R$ 449,84</span>
+      <span class="text-xs text-radar-text-muted text-right max-w-[80px]">economia potencial</span>
+    </div>
+  </div>
+
+  <!-- Barra de Ações -->
+  <div class="flex gap-4 mb-6">
+    <div class="relative flex-1">
+      <div class="absolute inset-y-0 left-0 flex items-center pl-4 text-radar-text-muted">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+          ></path>
+        </svg>
+      </div>
+      <input
+        type="text"
+        placeholder="Buscar na minha lista de desejos"
+        class="w-full bg-radar-surface border border-radar-border rounded-lg pl-11 pr-4 py-2.5 text-sm focus:outline-none focus:border-radar-green text-white"
+      />
+    </div>
+    <button
+      class="bg-radar-surface border border-radar-border px-4 py-2.5 rounded-lg text-sm flex items-center gap-2 hover:bg-radar-border"
+    >
+      Plataforma: PC
+    </button>
+    <button
+      class="bg-radar-surface border border-radar-border px-4 py-2.5 rounded-lg text-sm flex items-center gap-2 hover:bg-radar-border"
+    >
+      Ordenar: adicionados
+    </button>
+  </div>
+
+  <!-- Lista de Jogos (Exemplo Estrutural iterável) -->
+  <div class="flex flex-col gap-4">
+    @for (item of desejosMock; track item.id) {
+      <div
+        class="bg-radar-surface border border-radar-border rounded-xl p-4 flex items-center gap-6"
+      >
+        <img
+          [src]="item.imagem"
+          class="w-20 h-28 object-cover rounded-lg border border-radar-border"
+        />
+
+        <div class="flex-1">
+          <h3 class="text-xl font-bold mb-1">{{ item.titulo }}</h3>
+          <p class="text-xs text-radar-text-muted mb-3">
+            {{ item.edicao }} · {{ item.plataforma }}
+          </p>
+          <div class="flex items-center gap-2">
+            <span
+              class="bg-radar-green/20 text-radar-green border border-radar-green/30 text-[10px] font-bold px-2 py-0.5 rounded uppercase"
+              >Em promoção</span
+            >
+            <span class="text-xs text-radar-text-muted">Salvo na sua lista</span>
+          </div>
+        </div>
+
+        <div class="flex-1 border-l border-radar-border pl-6">
+          <p class="text-[10px] text-radar-text-muted uppercase tracking-wider mb-1">
+            Menor preço atual
+          </p>
+          <div class="flex items-end gap-2 mb-1">
+            <span class="text-2xl font-bold text-radar-green">{{ item.precoAtual }}</span>
+            <span class="text-radar-green text-sm font-bold mb-0.5">{{ item.desconto }}</span>
+          </div>
+          <p class="text-xs text-radar-text-muted">{{ item.melhorLoja }} · {{ item.plataforma }}</p>
+        </div>
+
+        <div class="flex-1 border-l border-radar-border pl-6">
+          <div class="flex items-center gap-2 text-sm font-medium text-radar-green mb-1">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"
+              ></path>
+            </svg>
+            {{ item.statusAlerta }}
+          </div>
+          <p class="text-xs text-radar-text-muted">{{ item.textoAlerta }}</p>
+        </div>
+
+        <div class="flex flex-col gap-2 shrink-0">
+          <button
+            class="bg-radar-bg border border-radar-border hover:border-radar-green text-sm font-medium px-6 py-2 rounded-lg transition-colors"
+          >
+            Comparar
+          </button>
+          <div class="flex justify-between items-center px-1">
+            <button class="text-xs text-white hover:text-radar-green flex items-center gap-1">
+              <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11h-4"
+                ></path>
+              </svg>
+              Ver alerta
+            </button>
+            <button
+              class="text-xs text-radar-text-muted hover:text-red-400 flex items-center gap-1"
+            >
+              <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
+                ></path>
+              </svg>
+            </button>
+          </div>
+        </div>
+      </div>
+    }
+  </div>
+</div>

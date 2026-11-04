@@ -1,0 +1,227 @@
+<div class="max-w-7xl mx-auto px-6 py-8">
+  <!-- Destaque Hero -->
+  <div class="mb-10">
+    <h1 class="text-3xl font-bold mb-2">Seu próximo jogo começa aqui.</h1>
+    <p class="text-radar-text-muted mb-6 text-sm">
+      Compare preços. Encontre oportunidades. Jogue mais.
+    </p>
+
+    <div
+      class="relative w-full h-80 rounded-2xl overflow-hidden border border-radar-border flex items-end p-8 cursor-pointer hover:border-radar-green transition-colors"
+    >
+      <img
+        src="https://images.unsplash.com/photo-1542751371-adc38448a05e?q=80&w=1920&auto=format&fit=crop"
+        class="absolute inset-0 w-full h-full object-cover opacity-50 hover:opacity-60 transition-opacity"
+      />
+      <div
+        class="absolute inset-0 bg-gradient-to-t from-radar-bg via-radar-bg/40 to-transparent"
+      ></div>
+
+      <div class="relative z-10 w-full flex justify-between items-end">
+        <div>
+          <span class="text-radar-green text-xs font-bold tracking-widest uppercase mb-2 block"
+            >No Radar · RPG / Mundo Aberto</span
+          >
+          <h2 class="text-4xl font-bold mb-2">ELDEN RING</h2>
+          <p class="text-radar-text-muted text-sm mb-6">Volte às Terras Intermédias por menos.</p>
+          <div class="flex items-center gap-4">
+            <button
+              class="bg-radar-green hover:bg-radar-green-hover text-radar-bg font-bold py-2.5 px-6 rounded-lg flex items-center gap-2 transition-colors"
+            >
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M14 5l7 7m0 0l-7 7m7-7H3"
+                ></path>
+              </svg>
+              Comparar preços
+            </button>
+            <span class="text-sm"
+              >a partir de <strong class="text-2xl ml-2">R$ 149,94</strong></span
+            >
+          </div>
+        </div>
+        <div
+          class="bg-radar-surface/80 backdrop-blur border border-radar-border px-3 py-1 rounded text-radar-green text-sm font-bold"
+        >
+          -40% NA EDIÇÃO PADRÃO
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Barra de Busca -->
+  <div class="flex gap-4 mb-8">
+    <div class="relative flex-1">
+      <div
+        class="absolute inset-y-0 left-0 flex items-center pl-4 pointer-events-none text-radar-text-muted"
+      >
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+          ></path>
+        </svg>
+      </div>
+      <input
+        type="text"
+        placeholder="Buscar um jogo, uma franquia ou uma edição"
+        class="w-full bg-radar-surface border border-radar-border rounded-lg pl-12 pr-4 py-3.5 text-sm focus:outline-none focus:border-radar-green text-white"
+      />
+    </div>
+    <button
+      class="bg-radar-green hover:bg-radar-green-hover text-radar-bg font-bold px-8 py-3.5 rounded-lg transition-colors"
+    >
+      Buscar jogos
+    </button>
+  </div>
+
+  <!-- Layout Principal (Filtros + Grid) -->
+  <div class="flex gap-8">
+    <!-- Sidebar de Filtros -->
+    <aside class="w-64 shrink-0">
+      <div class="flex justify-between items-center mb-6">
+        <h3 class="font-bold">Filtros</h3>
+        <button class="text-xs text-radar-green hover:underline">Limpar</button>
+      </div>
+
+      <div class="mb-6">
+        <h4 class="text-xs font-bold text-radar-text-muted mb-3 uppercase tracking-wider">
+          Plataforma
+        </h4>
+        <label class="flex items-center gap-3 mb-2 cursor-pointer text-sm"
+          ><input
+            type="checkbox"
+            checked
+            class="w-4 h-4 rounded border-radar-border bg-radar-bg text-radar-green focus:ring-radar-green"
+          />
+          PC</label
+        >
+        <label class="flex items-center gap-3 mb-2 cursor-pointer text-sm text-radar-text-muted"
+          ><input
+            type="checkbox"
+            class="w-4 h-4 rounded border-radar-border bg-radar-bg text-radar-green focus:ring-radar-green"
+          />
+          PlayStation</label
+        >
+        <label class="flex items-center gap-3 mb-2 cursor-pointer text-sm text-radar-text-muted"
+          ><input
+            type="checkbox"
+            class="w-4 h-4 rounded border-radar-border bg-radar-bg text-radar-green focus:ring-radar-green"
+          />
+          Xbox</label
+        >
+      </div>
+
+      <div class="mb-6">
+        <h4 class="text-xs font-bold text-radar-text-muted mb-3 uppercase tracking-wider">Lojas</h4>
+        <label class="flex items-center gap-3 mb-2 cursor-pointer text-sm"
+          ><input
+            type="checkbox"
+            checked
+            class="w-4 h-4 rounded border-radar-border bg-radar-bg text-radar-green focus:ring-radar-green"
+          />
+          Steam</label
+        >
+        <label class="flex items-center gap-3 mb-2 cursor-pointer text-sm"
+          ><input
+            type="checkbox"
+            checked
+            class="w-4 h-4 rounded border-radar-border bg-radar-bg text-radar-green focus:ring-radar-green"
+          />
+          Nuuvem</label
+        >
+      </div>
+
+      <button
+        class="w-full bg-radar-surface hover:bg-radar-border text-white border border-radar-border font-medium py-2 rounded-lg transition-colors text-sm mt-4"
+      >
+        Aplicar filtros
+      </button>
+    </aside>
+
+    <!-- Grid de Ofertas -->
+    <div class="flex-1">
+      <div class="flex justify-between items-center mb-6">
+        <div class="flex items-center gap-3">
+          <span class="text-sm font-medium">6 ofertas encontradas</span>
+          <span
+            class="bg-radar-surface border border-radar-border text-radar-green text-xs px-2 py-1 rounded flex items-center gap-1"
+            >PC <button class="hover:text-white">×</button></span
+          >
+        </div>
+        <div class="flex items-center gap-2 text-sm text-radar-text-muted">
+          Ordenar por:
+          <select class="bg-transparent border-none text-white focus:ring-0 cursor-pointer">
+            <option>Relevância</option>
+            <option>Menor Preço</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+        @for (jogo of jogos; track jogo.id) {
+          <div
+            class="bg-radar-surface border border-radar-border rounded-xl overflow-hidden hover:border-radar-green transition-colors cursor-pointer group"
+          >
+            <div class="relative h-40">
+              <img [src]="jogo.imagem" class="w-full h-full object-cover" />
+              <button
+                class="absolute top-3 right-3 text-white/70 hover:text-radar-green transition-colors"
+              >
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"
+                  ></path>
+                </svg>
+              </button>
+            </div>
+            <div class="p-4">
+              <h3 class="font-bold text-lg mb-1 truncate">{{ jogo.titulo }}</h3>
+              <p class="text-radar-text-muted text-xs mb-4">
+                {{ jogo.edicao }} · {{ jogo.plataforma }}
+              </p>
+
+              <div class="flex items-end gap-3 mb-4">
+                <span
+                  class="bg-radar-green/20 text-radar-green text-xs font-bold px-2 py-1 rounded"
+                  >{{ jogo.desconto }}</span
+                >
+                <span class="line-through text-radar-text-muted text-sm">{{
+                  jogo.precoAntigo
+                }}</span>
+                <span class="text-radar-green font-bold text-xl ml-auto">{{
+                  jogo.precoAtual
+                }}</span>
+              </div>
+
+              <div
+                class="flex justify-between items-center text-xs border-t border-radar-border pt-3 mt-1"
+              >
+                <span class="text-radar-text-muted">Menor preço · {{ jogo.melhorLoja }}</span>
+                <span
+                  class="text-white group-hover:text-radar-green flex items-center gap-1 transition-colors"
+                  >Comparar
+                  <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      stroke-width="2"
+                      d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"
+                    ></path></svg
+                ></span>
+              </div>
+            </div>
+          </div>
+        }
+      </div>
+    </div>
+  </div>
+</div>
