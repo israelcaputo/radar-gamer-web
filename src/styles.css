@@ -1,3 +1,27 @@
 /* You can add global styles to this file, and also import other style files */
 
 @import 'tailwindcss';
+
+@theme {
+  /* Cores base */
+  --color-radar-bg: #0d0e12;
+  --color-radar-surface: #15171c;
+  --color-radar-border: #2a2d35;
+
+  /* Cores de destaque (Neon) */
+  --color-radar-green: #c2ff05;
+  --color-radar-green-hover: #a6e500;
+
+  /* Cores de texto */
+  --color-radar-text-muted: #8e93a3;
+
+  /* Tipografia */
+  --font-sans: 'Inter', sans-serif;
+}
+
+/* Opcional: Define o fundo escuro e a fonte como padrão para toda a aplicação */
+@layer base {
+  body {
+    @apply bg-radar-bg text-white font-sans antialiased;
+  }
+}
