@@ -1,186 +1,111 @@
-<div class="max-w-7xl mx-auto px-6 py-8">
-  <p class="text-radar-green text-xs font-bold tracking-widest uppercase mb-2">
-    O preço certo, no momento certo
-  </p>
-  <div class="flex justify-between items-end mb-8">
-    <div>
-      <h1 class="text-4xl font-bold mb-2">Meus alertas</h1>
-      <p class="text-radar-text-muted text-sm">
-        Você define a meta. Seu radar acompanha as oportunidades.
-      </p>
+<div class="p-8 max-w-[1000px] mx-auto text-white relative">
+  <h1 class="text-3xl font-bold font-heading mb-8">Meus Alertas de Preço</h1>
+
+  <!-- Bloco CREATE -->
+  <div class="bg-[#1A1D24] p-6 rounded-xl border border-[#2A2D35] mb-8">
+    <h2 class="text-lg font-bold mb-4">Criar Novo Alerta</h2>
+    <div class="flex gap-4">
+      <input
+        type="text"
+        [(ngModel)]="novoJogoTitulo"
+        placeholder="Nome do Jogo"
+        class="flex-1 bg-[#0D0E12] border border-[#2A2D35] rounded-lg px-4 py-2 text-white focus:outline-none focus:border-[#CCFF00]"
+      />
+      <input
+        type="text"
+        [(ngModel)]="novoJogoPreco"
+        placeholder="Preço Alvo (Ex: R$ 50,00)"
+        class="w-1/4 bg-[#0D0E12] border border-[#2A2D35] rounded-lg px-4 py-2 text-white focus:outline-none focus:border-[#CCFF00]"
+      />
+      <button
+        (click)="adicionarAlerta()"
+        class="bg-[#CCFF00] text-black font-bold px-6 py-2 rounded-lg hover:bg-[#b3e600] transition-colors"
+      >
+        Adicionar
+      </button>
     </div>
-    <button
-      class="bg-radar-green hover:bg-radar-green-hover text-radar-bg font-bold px-6 py-3 rounded-lg flex items-center gap-2 transition-colors"
-    >
-      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-        <path
-          stroke-linecap="round"
-          stroke-linejoin="round"
-          stroke-width="2"
-          d="M12 4v16m8-8H4"
-        ></path>
-      </svg>
-      Novo alerta
-    </button>
   </div>
 
-  <div class="flex gap-8">
-    <!-- Coluna Esquerda: Lista de Alertas -->
-    <div class="flex-1">
-      <!-- Filtros inline -->
-      <div class="flex gap-4 mb-6">
-        <div class="relative flex-1">
-          <div class="absolute inset-y-0 left-0 flex items-center pl-4 text-radar-text-muted">
-            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                stroke-width="2"
-                d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
-              ></path>
-            </svg>
+  <!-- Bloco READ e DELETE -->
+  <div class="space-y-4">
+    @for (alerta of meusAlertas; track alerta.id) {
+      <div
+        class="bg-[#1A1D24] p-4 rounded-xl border border-[#2A2D35] flex justify-between items-center"
+      >
+        <div class="flex items-center gap-4">
+          <img
+            [src]="alerta.imagem"
+            alt="Capa"
+            class="w-16 h-12 object-cover rounded border border-[#2A2D35]"
+          />
+          <div>
+            <h3 class="font-bold text-lg text-white">{{ alerta.titulo }}</h3>
+            <p class="text-sm text-gray-400">
+              Loja: {{ alerta.melhorLoja }} | Plataforma: {{ alerta.plataforma }}
+            </p>
+            <p class="text-[#CCFF00] font-semibold mt-1">
+              Avisar quando chegar a: {{ alerta.precoAtual }}
+            </p>
           </div>
+        </div>
+
+        <div class="flex items-center gap-4">
+          <!-- Aciona a abertura do Modal passando o objeto atual -->
+          <button
+            (click)="abrirModalEditar(alerta)"
+            class="text-gray-300 hover:text-white font-medium text-sm transition-colors px-3 py-1 rounded bg-[#2A2D35] hover:bg-[#353842]"
+          >
+            Editar Preço
+          </button>
+
+          <button
+            (click)="removerAlerta(alerta.id)"
+            class="text-red-500 hover:text-red-400 font-medium text-sm transition-colors bg-red-500/10 px-3 py-1 rounded"
+          >
+            Excluir
+          </button>
+        </div>
+      </div>
+    } @empty {
+      <div class="text-center py-10 bg-[#1A1D24] rounded-xl border border-[#2A2D35]">
+        <p class="text-gray-400">Você ainda não possui nenhum alerta configurado.</p>
+      </div>
+    }
+  </div>
+
+  <!-- MODAL DE EDIÇÃO -->
+  @if (mostrarModal) {
+    <div class="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm">
+      <div class="bg-[#1A1D24] w-full max-w-md p-6 rounded-xl border border-[#2A2D35] shadow-2xl">
+        <h3 class="text-xl font-bold text-white mb-2">Editar Preço-Alvo</h3>
+        <p class="text-gray-400 text-sm mb-6">
+          Defina o novo valor desejado para receber notificações.
+        </p>
+
+        <div class="mb-6">
+          <label class="block text-sm font-medium text-gray-400 mb-2">Novo Preço</label>
           <input
             type="text"
-            placeholder="Buscar alerta por nome do jogo"
-            class="w-full bg-radar-surface border border-radar-border rounded-lg pl-11 pr-4 py-2.5 text-sm focus:outline-none focus:border-radar-green text-white"
+            [(ngModel)]="precoEdicao"
+            class="w-full bg-[#0D0E12] border border-[#2A2D35] rounded-lg px-4 py-3 text-white focus:outline-none focus:border-[#CCFF00]"
           />
         </div>
-        <button
-          class="bg-radar-surface border border-radar-border px-4 py-2.5 rounded-lg text-sm flex items-center gap-2 hover:bg-radar-border"
-        >
-          Status: todos
-        </button>
-        <button
-          class="bg-radar-surface border border-radar-border px-4 py-2.5 rounded-lg text-sm flex items-center gap-2 hover:bg-radar-border"
-        >
-          Plataforma: PC
-        </button>
-      </div>
 
-      <p class="text-xs font-bold text-radar-text-muted mb-4 uppercase">3 alertas encontrados</p>
-
-      <!-- Lista iterável de alertas -->
-      <div class="flex flex-col gap-4">
-        @for (alerta of alertasMock; track alerta.id) {
-          <div
-            class="bg-radar-surface border border-radar-border rounded-xl p-5 flex flex-col gap-4"
-          >
-            <div class="flex items-center gap-4">
-              <img
-                [src]="alerta.imagem"
-                class="w-16 h-16 object-cover rounded-lg border border-radar-border"
-              />
-              <div class="flex-1">
-                <h3 class="text-lg font-bold mb-1">{{ alerta.titulo }}</h3>
-                <p class="text-xs text-radar-text-muted mb-2">
-                  {{ alerta.edicao }} · {{ alerta.lojas }}
-                </p>
-                <span
-                  class="bg-radar-green/20 text-radar-green text-[10px] border border-radar-green/30 font-bold px-2 py-0.5 rounded uppercase"
-                  >{{ alerta.status }}</span
-                >
-              </div>
-
-              <div class="text-right px-6 border-r border-radar-border">
-                <p class="text-[10px] text-radar-text-muted uppercase tracking-wider mb-1">
-                  Seu preço-alvo
-                </p>
-                <p class="text-xl font-bold">{{ alerta.precoAlvo }}</p>
-              </div>
-
-              <div class="text-right pl-6 pr-2">
-                <p class="text-[10px] text-radar-text-muted uppercase tracking-wider mb-1">
-                  Preço atual
-                </p>
-                <p class="text-xl font-bold text-white">{{ alerta.precoAtual }}</p>
-              </div>
-            </div>
-
-            <div class="flex justify-between items-center border-t border-radar-border pt-4 mt-2">
-              <p class="text-xs text-radar-text-muted">{{ alerta.mensagemStatus }}</p>
-              <div class="flex gap-4">
-                <button
-                  class="text-xs font-medium text-white hover:text-radar-green flex items-center gap-1"
-                >
-                  Editar
-                </button>
-                <button
-                  class="text-xs font-medium text-white hover:text-radar-text-muted flex items-center gap-1"
-                >
-                  Pausar
-                </button>
-                <button
-                  class="text-xs font-medium text-radar-text-muted hover:text-red-400 flex items-center gap-1"
-                >
-                  Remover
-                </button>
-              </div>
-            </div>
-          </div>
-        }
-      </div>
-    </div>
-
-    <!-- Coluna Direita: Formulários / Drawer Lateral -->
-    <div class="w-80 shrink-0">
-      <div class="bg-radar-surface border border-radar-border rounded-xl p-6 mb-6">
-        <div class="flex justify-between items-center mb-6">
-          <h2 class="text-xl font-bold">Editar alerta</h2>
-          <button class="text-radar-text-muted hover:text-white">✕</button>
-        </div>
-
-        <div class="flex items-center gap-3 mb-6">
-          <span
-            class="border border-radar-green text-radar-green text-xs font-bold px-2 py-0.5 rounded"
-            >PC</span
-          >
-          <span class="font-bold text-sm">ELDEN RING</span>
-        </div>
-
-        <label class="block text-xs font-medium text-white mb-2">Preço-alvo</label>
-        <input
-          type="text"
-          value="R$ 129,90"
-          class="w-full bg-radar-bg border border-radar-border rounded-lg px-4 py-3 text-sm mb-5 text-white"
-        />
-
-        <label class="block text-xs font-medium text-white mb-2">Lojas acompanhadas</label>
-        <select
-          class="w-full bg-radar-bg border border-radar-border rounded-lg px-4 py-3 text-sm mb-5 text-white appearance-none"
-        >
-          <option>Todas as lojas compatíveis</option>
-        </select>
-
-        <label class="flex items-center gap-2 cursor-pointer mb-5">
-          <input
-            type="checkbox"
-            checked
-            class="w-4 h-4 rounded border-radar-border bg-radar-bg text-radar-green"
-          />
-          <span class="text-xs text-white">Receber aviso por e-mail</span>
-        </label>
-
-        <div class="flex justify-between items-center mb-8 border-t border-radar-border pt-5">
-          <span class="text-sm font-medium text-white">Alerta ativo</span>
-          <div class="w-10 h-6 bg-radar-green rounded-full relative cursor-pointer">
-            <div class="w-4 h-4 bg-radar-bg rounded-full absolute right-1 top-1"></div>
-          </div>
-        </div>
-
-        <div class="flex gap-3">
+        <div class="flex justify-end gap-3">
           <button
-            class="flex-1 bg-radar-bg border border-radar-border hover:border-radar-text-muted text-sm font-bold py-3 rounded-lg transition-colors"
+            (click)="fecharModal()"
+            class="px-5 py-2 text-gray-300 hover:text-white transition-colors"
           >
             Cancelar
           </button>
           <button
-            class="flex-1 bg-radar-green hover:bg-radar-green-hover text-radar-bg text-sm font-bold py-3 rounded-lg transition-colors"
+            (click)="salvarEdicao()"
+            class="bg-[#CCFF00] text-black font-bold px-5 py-2 rounded-lg hover:bg-[#b3e600] transition-colors"
           >
-            Salvar alterações
+            Salvar Alterações
           </button>
         </div>
       </div>
     </div>
-  </div>
+  }
 </div>
