@@ -1,81 +1,75 @@
-import { Component, OnInit } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { Component, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { GameService } from '../../services/game';
 import { Game } from '../../models/game';
+import { GameService } from '../../services/game';
 
+// Provisório: os alertas ainda ficam em memória no GameService.
+// Na próxima etapa passam para o AlertaService (json-server + HttpClient)
+// e os campos viram formulários com validação.
 @Component({
   selector: 'app-alertas',
-  standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [FormsModule],
   templateUrl: './alertas.html',
+  styleUrl: './alertas.css',
 })
-export class Alertas implements OnInit {
-  meusAlertas: Game[] = [];
+export class Alertas {
+  private readonly gameService = inject(GameService);
 
-  // Variáveis para o formulário de criação (CREATE)
-  novoJogoTitulo: string = '';
-  novoJogoPreco: string = '';
+  protected readonly meusAlertas = signal<Game[]>(this.gameService.getGames());
 
-  // Variáveis de controle do Modal de Edição (UPDATE)
-  mostrarModal: boolean = false;
-  idEmEdicao: number | null = null;
-  precoEdicao: string = '';
+  // Formulário de criação
+  protected readonly novoJogoTitulo = signal('');
+  protected readonly novoJogoPreco = signal('');
 
-  constructor(private gameService: GameService) {}
+  // Modal de edição
+  protected readonly idEmEdicao = signal<number | null>(null);
+  protected readonly precoEdicao = signal('');
 
-  ngOnInit() {
-    this.carregarAlertas();
+  protected adicionarAlerta(): void {
+    const titulo = this.novoJogoTitulo().trim();
+    if (!titulo) return;
+
+    this.gameService.adicionar({
+      titulo,
+      plataforma: 'PC',
+      edicao: 'Padrão',
+      desconto: '0%',
+      precoAntigo: 'R$ 0,00',
+      precoAtual: this.novoJogoPreco() || 'R$ 0,00',
+      melhorLoja: 'A definir',
+      imagem: `https://placehold.co/400x300/2A2D35/8E93A3?text=${encodeURIComponent(titulo)}`,
+    });
+
+    this.novoJogoTitulo.set('');
+    this.novoJogoPreco.set('');
+    this.recarregar();
   }
 
-  carregarAlertas() {
-    this.meusAlertas = this.gameService.getGames();
+  protected abrirModalEditar(alerta: Game): void {
+    this.idEmEdicao.set(alerta.id);
+    this.precoEdicao.set(alerta.precoAtual);
   }
 
-  adicionarAlerta() {
-    if (this.novoJogoTitulo.trim() !== '') {
-      this.gameService.adicionar({
-        titulo: this.novoJogoTitulo,
-        plataforma: 'PC',
-        edicao: 'Padrão',
-        desconto: '0%',
-        precoAntigo: 'R$ 0,00',
-        precoAtual: this.novoJogoPreco || 'R$ 0,00',
-        melhorLoja: 'A definir',
-        imagem: `https://placehold.co/400x300/2A2D35/8E93A3?text=${this.novoJogoTitulo.replace(' ', '+')}`,
-      });
-
-      this.novoJogoTitulo = '';
-      this.novoJogoPreco = '';
-      this.carregarAlertas();
-    }
+  protected fecharModal(): void {
+    this.idEmEdicao.set(null);
+    this.precoEdicao.set('');
   }
 
-  // Abre o modal e carrega os dados do alerta selecionado
-  abrirModalEditar(alerta: Game) {
-    this.idEmEdicao = alerta.id;
-    this.precoEdicao = alerta.precoAtual;
-    this.mostrarModal = true;
-  }
-
-  // Fecha o modal e limpa as variáveis temporárias
-  fecharModal() {
-    this.mostrarModal = false;
-    this.idEmEdicao = null;
-    this.precoEdicao = '';
-  }
-
-  // Salva a alteração no service e atualiza a tela
-  salvarEdicao() {
-    if (this.idEmEdicao !== null && this.precoEdicao.trim() !== '') {
-      this.gameService.editar(this.idEmEdicao, { precoAtual: this.precoEdicao });
-      this.carregarAlertas();
+  protected salvarEdicao(): void {
+    const id = this.idEmEdicao();
+    if (id !== null && this.precoEdicao().trim()) {
+      this.gameService.editar(id, { precoAtual: this.precoEdicao() });
+      this.recarregar();
       this.fecharModal();
     }
   }
 
-  removerAlerta(id: number) {
+  protected removerAlerta(id: number): void {
     this.gameService.excluir(id);
-    this.carregarAlertas();
+    this.recarregar();
+  }
+
+  private recarregar(): void {
+    this.meusAlertas.set([...this.gameService.getGames()]);
   }
 }
