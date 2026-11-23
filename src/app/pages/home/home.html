@@ -1,227 +1,270 @@
 <div class="max-w-7xl mx-auto px-6 py-8">
-  <!-- Destaque Hero -->
-  <div class="mb-10">
-    <h1 class="text-3xl font-bold mb-2">Seu próximo jogo começa aqui.</h1>
-    <p class="text-radar-text-muted mb-6 text-sm">
-      Compare preços. Encontre oportunidades. Jogue mais.
-    </p>
-
-    <div
-      class="relative w-full h-80 rounded-2xl overflow-hidden border border-radar-border flex items-end p-8 cursor-pointer hover:border-radar-green transition-colors"
-    >
-      <img
-        src="https://images.unsplash.com/photo-1542751371-adc38448a05e?q=80&w=1920&auto=format&fit=crop"
-        class="absolute inset-0 w-full h-full object-cover opacity-50 hover:opacity-60 transition-opacity"
-      />
-      <div
-        class="absolute inset-0 bg-gradient-to-t from-radar-bg via-radar-bg/40 to-transparent"
-      ></div>
-
-      <div class="relative z-10 w-full flex justify-between items-end">
-        <div>
-          <span class="text-radar-green text-xs font-bold tracking-widest uppercase mb-2 block"
-            >No Radar · RPG / Mundo Aberto</span
-          >
-          <h2 class="text-4xl font-bold mb-2">ELDEN RING</h2>
-          <p class="text-radar-text-muted text-sm mb-6">Volte às Terras Intermédias por menos.</p>
-          <div class="flex items-center gap-4">
-            <button
-              class="bg-radar-green hover:bg-radar-green-hover text-radar-bg font-bold py-2.5 px-6 rounded-lg flex items-center gap-2 transition-colors"
-            >
-              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  stroke-width="2"
-                  d="M14 5l7 7m0 0l-7 7m7-7H3"
-                ></path>
-              </svg>
-              Comparar preços
-            </button>
-            <span class="text-sm"
-              >a partir de <strong class="text-2xl ml-2">R$ 149,94</strong></span
-            >
-          </div>
-        </div>
-        <div
-          class="bg-radar-surface/80 backdrop-blur border border-radar-border px-3 py-1 rounded text-radar-green text-sm font-bold"
-        >
-          -40% NA EDIÇÃO PADRÃO
-        </div>
-      </div>
+  <!-- Cabeçalho -->
+  <div class="flex items-start justify-between gap-4 mb-6">
+    <div>
+      <h1 class="text-3xl font-bold mb-2">Seu próximo jogo começa aqui.</h1>
+      <p class="text-radar-text-muted text-sm">
+        Compare preços. Encontre oportunidades. Jogue mais.
+      </p>
     </div>
+    @if (cotacao(); as c) {
+      <span
+        class="border border-radar-border text-radar-text-muted text-xs px-3 py-1.5 rounded uppercase tracking-wide whitespace-nowrap"
+        [title]="
+          c.origem === 'api' ? 'Cotação da AwesomeAPI' : 'Cotação de reserva (API indisponível)'
+        "
+      >
+        PC · US$ 1 = {{ c.valor | currency: 'BRL' }}
+      </span>
+    }
   </div>
 
-  <!-- Barra de Busca -->
-  <div class="flex gap-4 mb-8">
-    <div class="relative flex-1">
+  <!-- Destaque -->
+  @if (destaque(); as jogo) {
+    <a
+      [routerLink]="['/detalhes', jogo.jogoId]"
+      class="relative block w-full h-52 rounded-2xl overflow-hidden border border-radar-border mb-6 hover:border-radar-green transition-colors"
+    >
+      <img
+        [src]="jogo.imagem"
+        [appImagemReserva]="jogo.imagemReserva"
+        [alt]="jogo.titulo"
+        class="absolute right-0 top-0 h-full w-2/3 object-cover opacity-70"
+      />
       <div
-        class="absolute inset-y-0 left-0 flex items-center pl-4 pointer-events-none text-radar-text-muted"
-      >
-        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            stroke-width="2"
-            d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
-          ></path>
-        </svg>
+        class="absolute inset-0 bg-gradient-to-r from-radar-surface via-radar-surface/90 to-transparent"
+      ></div>
+
+      <div class="relative z-10 h-full flex flex-col justify-center p-8 max-w-xl">
+        <span class="text-radar-green text-xs font-bold tracking-widest uppercase mb-2">
+          No radar · maior desconto agora
+        </span>
+        <h2 class="text-3xl font-bold uppercase mb-2 truncate">{{ jogo.titulo }}</h2>
+        <p class="text-radar-text-muted text-sm mb-5">
+          Na {{ jogo.loja?.nome ?? 'loja parceira' }}, por menos.
+        </p>
+        <div class="flex items-center gap-4">
+          <span
+            class="bg-radar-green hover:bg-radar-green-hover text-radar-bg font-bold py-2.5 px-5 rounded-lg flex items-center gap-2 transition-colors"
+          >
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M14 5l7 7m0 0l-7 7m7-7H3"
+              />
+            </svg>
+            Comparar preços
+          </span>
+          <span class="text-sm text-radar-text-muted">
+            a partir de
+            <strong class="text-2xl text-radar-green ml-2">{{
+              jogo.preco | currency: 'BRL'
+            }}</strong>
+          </span>
+        </div>
       </div>
+
+      <span
+        class="absolute top-5 right-5 z-10 bg-radar-bg/80 border border-radar-green/40 px-3 py-1 rounded text-radar-green text-xs font-bold"
+      >
+        −{{ jogo.desconto }}% NA {{ jogo.loja?.nome | uppercase }}
+      </span>
+    </a>
+  }
+
+  <!-- Busca -->
+  <form class="flex gap-4 mb-8" (submit)="$event.preventDefault(); buscar()">
+    <div class="relative flex-1">
+      <svg
+        class="w-5 h-5 absolute left-4 top-1/2 -translate-y-1/2 text-radar-text-muted pointer-events-none"
+        fill="none"
+        stroke="currentColor"
+        viewBox="0 0 24 24"
+      >
+        <path
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          stroke-width="2"
+          d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+        />
+      </svg>
       <input
-        type="text"
+        type="search"
         placeholder="Buscar um jogo, uma franquia ou uma edição"
-        class="w-full bg-radar-surface border border-radar-border rounded-lg pl-12 pr-4 py-3.5 text-sm focus:outline-none focus:border-radar-green text-white"
+        [value]="termo()"
+        (input)="termo.set($any($event.target).value)"
+        class="w-full bg-radar-surface border border-radar-border rounded-lg pl-12 pr-4 py-3.5 text-sm focus:outline-none focus:border-radar-green"
       />
     </div>
     <button
+      type="submit"
       class="bg-radar-green hover:bg-radar-green-hover text-radar-bg font-bold px-8 py-3.5 rounded-lg transition-colors"
     >
       Buscar jogos
     </button>
-  </div>
+  </form>
 
-  <!-- Layout Principal (Filtros + Grid) -->
   <div class="flex gap-8">
-    <!-- Sidebar de Filtros -->
-    <aside class="w-64 shrink-0">
-      <div class="flex justify-between items-center mb-6">
+    <!-- Filtros -->
+    <aside
+      class="w-56 shrink-0 self-start bg-radar-surface border border-radar-border rounded-xl p-5"
+    >
+      <div class="flex justify-between items-center mb-5">
         <h3 class="font-bold">Filtros</h3>
-        <button class="text-xs text-radar-green hover:underline">Limpar</button>
+        <button
+          type="button"
+          (click)="limparFiltros()"
+          class="text-xs text-radar-green hover:underline"
+        >
+          Limpar
+        </button>
       </div>
 
-      <div class="mb-6">
-        <h4 class="text-xs font-bold text-radar-text-muted mb-3 uppercase tracking-wider">
-          Plataforma
-        </h4>
-        <label class="flex items-center gap-3 mb-2 cursor-pointer text-sm"
-          ><input
+      <h4 class="text-xs font-bold text-radar-text-muted mb-3 uppercase tracking-wider">Lojas</h4>
+      @for (loja of lojas(); track loja.id) {
+        <label class="flex items-center gap-3 mb-2.5 cursor-pointer text-sm">
+          <input
             type="checkbox"
-            checked
-            class="w-4 h-4 rounded border-radar-border bg-radar-bg text-radar-green focus:ring-radar-green"
+            [checked]="lojasSelecionadas().includes(loja.id)"
+            (change)="alternarLoja(loja.id)"
+            class="w-4 h-4 accent-radar-green"
           />
-          PC</label
-        >
-        <label class="flex items-center gap-3 mb-2 cursor-pointer text-sm text-radar-text-muted"
-          ><input
-            type="checkbox"
-            class="w-4 h-4 rounded border-radar-border bg-radar-bg text-radar-green focus:ring-radar-green"
-          />
-          PlayStation</label
-        >
-        <label class="flex items-center gap-3 mb-2 cursor-pointer text-sm text-radar-text-muted"
-          ><input
-            type="checkbox"
-            class="w-4 h-4 rounded border-radar-border bg-radar-bg text-radar-green focus:ring-radar-green"
-          />
-          Xbox</label
-        >
-      </div>
+          <img [src]="loja.icone" alt="" class="w-4 h-4" />
+          {{ loja.nome }}
+        </label>
+      } @empty {
+        <p class="text-xs text-radar-text-muted">Carregando lojas…</p>
+      }
 
-      <div class="mb-6">
-        <h4 class="text-xs font-bold text-radar-text-muted mb-3 uppercase tracking-wider">Lojas</h4>
-        <label class="flex items-center gap-3 mb-2 cursor-pointer text-sm"
-          ><input
-            type="checkbox"
-            checked
-            class="w-4 h-4 rounded border-radar-border bg-radar-bg text-radar-green focus:ring-radar-green"
-          />
-          Steam</label
-        >
-        <label class="flex items-center gap-3 mb-2 cursor-pointer text-sm"
-          ><input
-            type="checkbox"
-            checked
-            class="w-4 h-4 rounded border-radar-border bg-radar-bg text-radar-green focus:ring-radar-green"
-          />
-          Nuuvem</label
-        >
-      </div>
+      <hr class="border-radar-border my-4" />
+
+      <label class="flex items-center gap-3 cursor-pointer text-sm">
+        <input
+          type="checkbox"
+          [checked]="somenteComDesconto()"
+          (change)="somenteComDesconto.set($any($event.target).checked)"
+          class="w-4 h-4 accent-radar-green"
+        />
+        Somente com desconto
+      </label>
 
       <button
-        class="w-full bg-radar-surface hover:bg-radar-border text-white border border-radar-border font-medium py-2 rounded-lg transition-colors text-sm mt-4"
+        type="button"
+        (click)="buscar()"
+        class="w-full bg-radar-bg hover:bg-radar-border border border-radar-border font-medium py-2.5 rounded-lg transition-colors text-sm mt-5"
       >
         Aplicar filtros
       </button>
     </aside>
 
-    <!-- Grid de Ofertas -->
-    <div class="flex-1">
-      <div class="flex justify-between items-center mb-6">
-        <div class="flex items-center gap-3">
-          <span class="text-sm font-medium">6 ofertas encontradas</span>
-          <span
-            class="bg-radar-surface border border-radar-border text-radar-green text-xs px-2 py-1 rounded flex items-center gap-1"
-            >PC <button class="hover:text-white">×</button></span
-          >
+    <!-- Resultados -->
+    <section class="flex-1 min-w-0">
+      <div class="flex justify-between items-center mb-5">
+        <div class="flex items-center gap-3 text-sm">
+          @if (ofertas.isLoading()) {
+            <span class="text-radar-text-muted">Buscando ofertas…</span>
+          } @else {
+            <span class="font-medium">{{ ofertas.value().length }} ofertas encontradas</span>
+          }
+          @if (filtro().termo) {
+            <span class="border border-radar-green/40 text-radar-green text-xs px-2 py-1 rounded">
+              “{{ filtro().termo }}”
+            </span>
+          }
         </div>
-        <div class="flex items-center gap-2 text-sm text-radar-text-muted">
+        <label class="flex items-center gap-2 text-sm text-radar-text-muted">
           Ordenar por:
-          <select class="bg-transparent border-none text-white focus:ring-0 cursor-pointer">
-            <option>Relevância</option>
-            <option>Menor Preço</option>
-          </select>
-        </div>
-      </div>
-
-      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
-        @for (jogo of jogos; track jogo.id) {
-          <div
-            class="bg-radar-surface border border-radar-border rounded-xl overflow-hidden hover:border-radar-green transition-colors cursor-pointer group"
+          <select
+            [value]="filtro().ordenacao"
+            (change)="ordenar($any($event.target).value)"
+            class="bg-radar-bg text-white focus:outline-none cursor-pointer"
           >
-            <div class="relative h-40">
-              <img [src]="jogo.imagem" class="w-full h-full object-cover" />
-              <button
-                class="absolute top-3 right-3 text-white/70 hover:text-radar-green transition-colors"
-              >
-                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                    stroke-width="2"
-                    d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"
-                  ></path>
-                </svg>
-              </button>
-            </div>
-            <div class="p-4">
-              <h3 class="font-bold text-lg mb-1 truncate">{{ jogo.titulo }}</h3>
-              <p class="text-radar-text-muted text-xs mb-4">
-                {{ jogo.edicao }} · {{ jogo.plataforma }}
-              </p>
-
-              <div class="flex items-end gap-3 mb-4">
-                <span
-                  class="bg-radar-green/20 text-radar-green text-xs font-bold px-2 py-1 rounded"
-                  >{{ jogo.desconto }}</span
-                >
-                <span class="line-through text-radar-text-muted text-sm">{{
-                  jogo.precoAntigo
-                }}</span>
-                <span class="text-radar-green font-bold text-xl ml-auto">{{
-                  jogo.precoAtual
-                }}</span>
-              </div>
-
-              <div
-                class="flex justify-between items-center text-xs border-t border-radar-border pt-3 mt-1"
-              >
-                <span class="text-radar-text-muted">Menor preço · {{ jogo.melhorLoja }}</span>
-                <span
-                  class="text-white group-hover:text-radar-green flex items-center gap-1 transition-colors"
-                  >Comparar
-                  <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path
-                      stroke-linecap="round"
-                      stroke-linejoin="round"
-                      stroke-width="2"
-                      d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"
-                    ></path></svg
-                ></span>
-              </div>
-            </div>
-          </div>
-        }
+            @for (opcao of opcoesOrdenacao; track opcao.valor) {
+              <option [value]="opcao.valor">{{ opcao.rotulo }}</option>
+            }
+          </select>
+        </label>
       </div>
-    </div>
+
+      @if (ofertas.error()) {
+        <div class="border border-red-500/40 bg-red-500/10 rounded-xl p-6 text-sm">
+          Não foi possível consultar as ofertas agora. Verifique sua conexão e
+          <button type="button" (click)="ofertas.reload()" class="text-radar-green underline">
+            tente de novo</button
+          >.
+        </div>
+      } @else if (ofertas.isLoading() && ofertas.value().length === 0) {
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+          @for (i of [1, 2, 3, 4, 5, 6]; track i) {
+            <div
+              class="h-72 rounded-xl bg-radar-surface border border-radar-border animate-pulse"
+            ></div>
+          }
+        </div>
+      } @else {
+        <div
+          class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5"
+          [class.opacity-60]="ofertas.isLoading()"
+        >
+          @for (oferta of ofertas.value(); track oferta.jogoId) {
+            <a
+              [routerLink]="['/detalhes', oferta.jogoId]"
+              class="bg-radar-surface border border-radar-border rounded-xl overflow-hidden hover:border-radar-green transition-colors group"
+            >
+              <img
+                [src]="oferta.imagem"
+                [appImagemReserva]="oferta.imagemReserva"
+                [alt]="oferta.titulo"
+                loading="lazy"
+                class="w-full h-36 object-cover bg-radar-bg"
+              />
+              <div class="p-4">
+                <h3 class="font-bold text-lg mb-1 truncate" [title]="oferta.titulo">
+                  {{ oferta.titulo }}
+                </h3>
+                <p class="text-radar-text-muted text-xs mb-4">PC</p>
+
+                <div class="flex items-center gap-3 mb-4">
+                  @if (oferta.desconto > 0) {
+                    <span
+                      class="border border-radar-green/40 text-radar-green text-xs font-bold px-2 py-1 rounded"
+                    >
+                      −{{ oferta.desconto }}%
+                    </span>
+                    <span class="line-through text-radar-text-muted text-xs">
+                      {{ oferta.precoOriginal | currency: 'BRL' }}
+                    </span>
+                  }
+                  <span class="text-radar-green font-bold text-xl">{{
+                    oferta.preco | currency: 'BRL'
+                  }}</span>
+                </div>
+
+                <div class="flex justify-between items-center text-xs">
+                  <span class="text-radar-text-muted">Menor preço · {{ oferta.loja?.nome }}</span>
+                  <span class="font-bold group-hover:text-radar-green transition-colors"
+                    >Comparar ↗</span
+                  >
+                </div>
+              </div>
+            </a>
+          } @empty {
+            <p class="col-span-full text-center text-radar-text-muted py-16">
+              Nenhuma oferta encontrada com esses filtros.
+            </p>
+          }
+        </div>
+      }
+
+      <p class="text-xs text-radar-text-muted mt-6">
+        Preços em dólar da
+        <a href="https://www.cheapshark.com" target="_blank" rel="noopener" class="underline"
+          >CheapShark</a
+        >, convertidos para real com a cotação da AwesomeAPI. Valores aproximados; o preço final é o
+        da loja.
+      </p>
+    </section>
   </div>
 </div>
