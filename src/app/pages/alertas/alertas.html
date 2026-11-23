@@ -28,7 +28,7 @@
 
   <!-- Bloco READ e DELETE -->
   <div class="space-y-4">
-    @for (alerta of meusAlertas; track alerta.id) {
+    @for (alerta of meusAlertas(); track alerta.id) {
       <div
         class="bg-[#1A1D24] p-4 rounded-xl border border-[#2A2D35] flex justify-between items-center"
       >
@@ -74,7 +74,7 @@
   </div>
 
   <!-- MODAL DE EDIÇÃO -->
-  @if (mostrarModal) {
+  @if (idEmEdicao() !== null) {
     <div class="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm">
       <div class="bg-[#1A1D24] w-full max-w-md p-6 rounded-xl border border-[#2A2D35] shadow-2xl">
         <h3 class="text-xl font-bold text-white mb-2">Editar Preço-Alvo</h3>
