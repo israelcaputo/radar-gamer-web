@@ -54,10 +54,11 @@
         </p>
         <button
           type="button"
-          (click)="adicionarNaListaDesejos()"
-          class="flex items-center gap-2 text-sm font-bold w-fit bg-radar-surface border border-radar-border px-4 py-2.5 rounded-lg hover:border-radar-green transition-colors"
+          (click)="alternarListaDesejos()"
+          class="btn-secundario w-fit text-sm py-2.5 bg-radar-surface"
+          [class.!border-radar-green]="naLista()"
         >
-          ♡ Adicionar à lista de desejos
+          {{ naLista() ? '♥ Na lista de desejos' : '♡ Adicionar à lista de desejos' }}
         </button>
       </div>
 
@@ -99,12 +100,19 @@
       }
     </div>
 
-    @if (aviso()) {
+    @let mensagem = aviso()?.texto || erroDadosUsuario();
+    @if (mensagem) {
       <div
-        class="border border-radar-green/40 bg-radar-green/10 text-radar-green text-sm rounded-lg px-4 py-3 mb-6 flex justify-between"
+        class="border text-sm rounded-lg px-4 py-3 mb-6 flex justify-between gap-4"
+        [class]="
+          aviso()?.erro || !aviso()
+            ? 'border-red-500/40 bg-red-500/10 text-red-300'
+            : 'border-radar-green/40 bg-radar-green/10 text-radar-green'
+        "
+        role="status"
       >
-        {{ aviso() }}
-        <button type="button" (click)="aviso.set('')" aria-label="Fechar">✕</button>
+        {{ mensagem }}
+        <button type="button" (click)="aviso.set(null)" aria-label="Fechar">✕</button>
       </div>
     }
 
@@ -208,39 +216,35 @@
 
       <!-- Alerta -->
       <aside class="w-[340px] shrink-0 space-y-6">
-        <section class="bg-radar-surface border border-radar-border rounded-xl p-6">
-          <h3 class="font-bold text-lg mb-2">Avise quando baixar</h3>
+        <section id="alerta" class="card p-6 scroll-mt-24">
+          <h3 class="font-bold text-lg mb-2">
+            {{ alertaExistente() ? 'Seu alerta' : 'Avise quando baixar' }}
+          </h3>
           <p class="text-xs text-radar-text-muted mb-5 leading-relaxed">
-            Defina quanto quer pagar por {{ j.titulo }}. O radar acompanha as lojas para você.
-          </p>
-          <label for="preco-alvo" class="block text-xs font-medium mb-2">Preço-alvo (R$)</label>
-          <input
-            id="preco-alvo"
-            type="number"
-            min="0.01"
-            step="0.01"
-            [value]="precoAlvo()"
-            (input)="precoAlvo.set(+$any($event.target).value)"
-            class="w-full bg-radar-bg border border-radar-border rounded-lg px-4 py-3 text-sm focus:outline-none focus:border-radar-green mb-2"
-          />
-          @if (melhorOferta(); as melhor) {
-            @if (precoAlvo() < melhor.preco) {
-              <p class="text-xs text-radar-text-muted mb-5">
-                {{ melhor.preco - precoAlvo() | currency: 'BRL' }} abaixo do menor preço atual.
-              </p>
+            @if (alertaExistente()) {
+              Você já acompanha {{ j.titulo }}. Ajuste o alerta quando quiser.
             } @else {
-              <p class="text-xs text-radar-green mb-5">
-                Esse valor já foi atingido na {{ melhor.loja?.nome }}.
-              </p>
+              Defina quanto quer pagar por {{ j.titulo }}. O radar acompanha as lojas para você.
             }
+          </p>
+          <app-alerta-form
+            [lojas]="lojasDoJogo()"
+            [valor]="alertaExistente() ?? null"
+            [sugestao]="sugestaoPreco()"
+            [precoAtual]="melhorOferta()?.preco"
+            [mostrarAtivo]="!!alertaExistente()"
+            [textoBotao]="alertaExistente() ? 'Salvar alterações' : 'Criar alerta'"
+            [enviando]="salvandoAlerta()"
+            (salvar)="salvarAlerta($event)"
+          />
+          @if (alertaExistente()) {
+            <a
+              routerLink="/alertas"
+              class="block text-center text-xs text-radar-green hover:underline mt-4"
+            >
+              Ver todos os meus alertas
+            </a>
           }
-          <button
-            type="button"
-            (click)="criarAlerta()"
-            class="w-full bg-radar-green hover:bg-radar-green-hover text-radar-bg font-bold py-3 rounded-lg transition-colors"
-          >
-            Criar alerta
-          </button>
         </section>
 
         <section
