@@ -74,197 +74,204 @@
     </a>
   }
 
-  <!-- Busca -->
-  <form class="flex gap-4 mb-8" (submit)="$event.preventDefault(); buscar()">
-    <div class="relative flex-1">
-      <svg
-        class="w-5 h-5 absolute left-4 top-1/2 -translate-y-1/2 text-radar-text-muted pointer-events-none"
-        fill="none"
-        stroke="currentColor"
-        viewBox="0 0 24 24"
-      >
-        <path
-          stroke-linecap="round"
-          stroke-linejoin="round"
-          stroke-width="2"
-          d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
-        />
-      </svg>
-      <input
-        type="search"
-        placeholder="Buscar um jogo, uma franquia ou uma edição"
-        [value]="termo()"
-        (input)="termo.set($any($event.target).value)"
-        class="w-full bg-radar-surface border border-radar-border rounded-lg pl-12 pr-4 py-3.5 text-sm focus:outline-none focus:border-radar-green"
-      />
+  @if (aviso() || erroListaDesejos()) {
+    <div
+      class="border border-radar-green/40 bg-radar-green/10 text-radar-green text-sm rounded-lg px-4 py-3 mb-6 flex justify-between gap-4"
+    >
+      {{ aviso() || erroListaDesejos() }}
+      <button type="button" (click)="aviso.set('')" aria-label="Fechar">✕</button>
     </div>
-    <button
-      type="submit"
-      class="bg-radar-green hover:bg-radar-green-hover text-radar-bg font-bold px-8 py-3.5 rounded-lg transition-colors"
-    >
-      Buscar jogos
-    </button>
-  </form>
+  }
 
-  <div class="flex gap-8">
-    <!-- Filtros -->
-    <aside
-      class="w-56 shrink-0 self-start bg-radar-surface border border-radar-border rounded-xl p-5"
-    >
-      <div class="flex justify-between items-center mb-5">
-        <h3 class="font-bold">Filtros</h3>
-        <button
-          type="button"
-          (click)="limparFiltros()"
-          class="text-xs text-radar-green hover:underline"
+  <form [formGroup]="form" (ngSubmit)="buscar()" novalidate>
+    <!-- Busca -->
+    <div class="flex gap-4 mb-8">
+      <div class="relative flex-1">
+        <svg
+          class="w-5 h-5 absolute left-4 top-[26px] -translate-y-1/2 text-radar-text-muted pointer-events-none"
+          fill="none"
+          stroke="currentColor"
+          viewBox="0 0 24 24"
         >
-          Limpar
-        </button>
-      </div>
-
-      <h4 class="text-xs font-bold text-radar-text-muted mb-3 uppercase tracking-wider">Lojas</h4>
-      @for (loja of lojas(); track loja.id) {
-        <label class="flex items-center gap-3 mb-2.5 cursor-pointer text-sm">
-          <input
-            type="checkbox"
-            [checked]="lojasSelecionadas().includes(loja.id)"
-            (change)="alternarLoja(loja.id)"
-            class="w-4 h-4 accent-radar-green"
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
           />
-          <img [src]="loja.icone" alt="" class="w-4 h-4" />
-          {{ loja.nome }}
-        </label>
-      } @empty {
-        <p class="text-xs text-radar-text-muted">Carregando lojas…</p>
-      }
-
-      <hr class="border-radar-border my-4" />
-
-      <label class="flex items-center gap-3 cursor-pointer text-sm">
+        </svg>
         <input
-          type="checkbox"
-          [checked]="somenteComDesconto()"
-          (change)="somenteComDesconto.set($any($event.target).checked)"
-          class="w-4 h-4 accent-radar-green"
+          type="search"
+          formControlName="termo"
+          placeholder="Buscar um jogo, uma franquia ou uma edição"
+          aria-label="Buscar jogos"
+          class="campo pl-12 py-3.5"
         />
-        Somente com desconto
-      </label>
-
-      <button
-        type="button"
-        (click)="buscar()"
-        class="w-full bg-radar-bg hover:bg-radar-border border border-radar-border font-medium py-2.5 rounded-lg transition-colors text-sm mt-5"
-      >
-        Aplicar filtros
-      </button>
-    </aside>
-
-    <!-- Resultados -->
-    <section class="flex-1 min-w-0">
-      <div class="flex justify-between items-center mb-5">
-        <div class="flex items-center gap-3 text-sm">
-          @if (ofertas.isLoading()) {
-            <span class="text-radar-text-muted">Buscando ofertas…</span>
-          } @else {
-            <span class="font-medium">{{ ofertas.value().length }} ofertas encontradas</span>
-          }
-          @if (filtro().termo) {
-            <span class="border border-radar-green/40 text-radar-green text-xs px-2 py-1 rounded">
-              “{{ filtro().termo }}”
-            </span>
-          }
-        </div>
-        <label class="flex items-center gap-2 text-sm text-radar-text-muted">
-          Ordenar por:
-          <select
-            [value]="filtro().ordenacao"
-            (change)="ordenar($any($event.target).value)"
-            class="bg-radar-bg text-white focus:outline-none cursor-pointer"
-          >
-            @for (opcao of opcoesOrdenacao; track opcao.valor) {
-              <option [value]="opcao.valor">{{ opcao.rotulo }}</option>
-            }
-          </select>
-        </label>
+        <app-campo-erro [controle]="form.controls.termo" />
       </div>
+      <button type="submit" class="btn-primario px-8 self-start">Buscar jogos</button>
+    </div>
 
-      @if (ofertas.error()) {
-        <div class="border border-red-500/40 bg-red-500/10 rounded-xl p-6 text-sm">
-          Não foi possível consultar as ofertas agora. Verifique sua conexão e
-          <button type="button" (click)="ofertas.reload()" class="text-radar-green underline">
-            tente de novo</button
-          >.
+    <div class="flex gap-8">
+      <!-- Filtros -->
+      <aside class="w-56 shrink-0 self-start card p-5">
+        <div class="flex justify-between items-center mb-5">
+          <h3 class="font-bold">Filtros</h3>
+          <button
+            type="button"
+            (click)="limparFiltros()"
+            class="text-xs text-radar-green hover:underline"
+          >
+            Limpar
+          </button>
         </div>
-      } @else if (ofertas.isLoading() && ofertas.value().length === 0) {
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
-          @for (i of [1, 2, 3, 4, 5, 6]; track i) {
-            <div
-              class="h-72 rounded-xl bg-radar-surface border border-radar-border animate-pulse"
-            ></div>
-          }
-        </div>
-      } @else {
-        <div
-          class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5"
-          [class.opacity-60]="ofertas.isLoading()"
-        >
-          @for (oferta of ofertas.value(); track oferta.jogoId) {
-            <a
-              [routerLink]="['/detalhes', oferta.jogoId]"
-              class="bg-radar-surface border border-radar-border rounded-xl overflow-hidden hover:border-radar-green transition-colors group"
-            >
-              <img
-                [src]="oferta.imagem"
-                [appImagemReserva]="oferta.imagemReserva"
-                [alt]="oferta.titulo"
-                loading="lazy"
-                class="w-full h-36 object-cover bg-radar-bg"
-              />
-              <div class="p-4">
-                <h3 class="font-bold text-lg mb-1 truncate" [title]="oferta.titulo">
-                  {{ oferta.titulo }}
-                </h3>
-                <p class="text-radar-text-muted text-xs mb-4">PC</p>
 
-                <div class="flex items-center gap-3 mb-4">
-                  @if (oferta.desconto > 0) {
-                    <span
-                      class="border border-radar-green/40 text-radar-green text-xs font-bold px-2 py-1 rounded"
-                    >
-                      −{{ oferta.desconto }}%
-                    </span>
-                    <span class="line-through text-radar-text-muted text-xs">
-                      {{ oferta.precoOriginal | currency: 'BRL' }}
-                    </span>
-                  }
-                  <span class="text-radar-green font-bold text-xl">{{
-                    oferta.preco | currency: 'BRL'
-                  }}</span>
-                </div>
-
-                <div class="flex justify-between items-center text-xs">
-                  <span class="text-radar-text-muted">Menor preço · {{ oferta.loja?.nome }}</span>
-                  <span class="font-bold group-hover:text-radar-green transition-colors"
-                    >Comparar ↗</span
-                  >
-                </div>
-              </div>
-            </a>
+        <h4 class="text-xs font-bold text-radar-text-muted mb-3 uppercase tracking-wider">Lojas</h4>
+        <div formGroupName="lojas">
+          @for (loja of lojas(); track loja.id) {
+            <label class="flex items-center gap-3 mb-2.5 cursor-pointer text-sm">
+              <input type="checkbox" [formControlName]="loja.id" class="w-4 h-4" />
+              <img [src]="loja.icone" alt="" class="w-4 h-4" />
+              {{ loja.nome }}
+            </label>
           } @empty {
-            <p class="col-span-full text-center text-radar-text-muted py-16">
-              Nenhuma oferta encontrada com esses filtros.
-            </p>
+            <p class="text-xs text-radar-text-muted">Carregando lojas…</p>
           }
         </div>
-      }
+        <app-campo-erro
+          [controle]="form.controls.lojas"
+          [mensagens]="{ nenhumMarcado: 'Escolha pelo menos uma loja.' }"
+        />
 
-      <p class="text-xs text-radar-text-muted mt-6">
-        Preços em dólar da
-        <a href="https://www.cheapshark.com" target="_blank" rel="noopener" class="underline"
-          >CheapShark</a
-        >, convertidos para real com a cotação da AwesomeAPI. Valores aproximados; o preço final é o
-        da loja.
-      </p>
-    </section>
-  </div>
+        <hr class="border-radar-border my-4" />
+
+        <label class="flex items-center gap-3 cursor-pointer text-sm">
+          <input type="checkbox" formControlName="somenteComDesconto" class="w-4 h-4" />
+          Somente com desconto
+        </label>
+
+        <button type="submit" class="btn-secundario w-full text-sm py-2.5 mt-5">
+          Aplicar filtros
+        </button>
+      </aside>
+
+      <!-- Resultados -->
+      <section class="flex-1 min-w-0">
+        <div class="flex justify-between items-center mb-5">
+          <div class="flex items-center gap-3 text-sm">
+            @if (ofertas.isLoading()) {
+              <span class="text-radar-text-muted">Buscando ofertas…</span>
+            } @else {
+              <span class="font-medium">{{ ofertas.value().length }} ofertas encontradas</span>
+            }
+            @if (filtro().termo) {
+              <span class="border border-radar-green/40 text-radar-green text-xs px-2 py-1 rounded">
+                “{{ filtro().termo }}”
+              </span>
+            }
+          </div>
+          <label class="flex items-center gap-2 text-sm text-radar-text-muted">
+            Ordenar por:
+            <select
+              formControlName="ordenacao"
+              class="bg-radar-bg text-white focus:outline-none cursor-pointer"
+            >
+              @for (opcao of opcoesOrdenacao; track opcao.valor) {
+                <option [value]="opcao.valor">{{ opcao.rotulo }}</option>
+              }
+            </select>
+          </label>
+        </div>
+
+        @if (ofertas.error()) {
+          <div class="border border-red-500/40 bg-red-500/10 rounded-xl p-6 text-sm">
+            Não foi possível consultar as ofertas agora. Verifique sua conexão e
+            <button type="button" (click)="ofertas.reload()" class="text-radar-green underline">
+              tente de novo</button
+            >.
+          </div>
+        } @else if (ofertas.isLoading() && ofertas.value().length === 0) {
+          <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+            @for (i of [1, 2, 3, 4, 5, 6]; track i) {
+              <div
+                class="h-72 rounded-xl bg-radar-surface border border-radar-border animate-pulse"
+              ></div>
+            }
+          </div>
+        } @else {
+          <div
+            class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5"
+            [class.opacity-60]="ofertas.isLoading()"
+          >
+            @for (oferta of ofertas.value(); track oferta.jogoId) {
+              <a
+                [routerLink]="['/detalhes', oferta.jogoId]"
+                class="bg-radar-surface border border-radar-border rounded-xl overflow-hidden hover:border-radar-green transition-colors group"
+              >
+                <div class="relative">
+                  <img
+                    [src]="oferta.imagem"
+                    [appImagemReserva]="oferta.imagemReserva"
+                    [alt]="oferta.titulo"
+                    loading="lazy"
+                    class="w-full h-36 object-cover bg-radar-bg"
+                  />
+                  <button
+                    type="button"
+                    (click)="alternarDesejo($event, oferta)"
+                    class="absolute top-3 right-3 w-9 h-9 rounded-full bg-radar-bg/80 flex items-center justify-center text-lg transition-colors"
+                    [class]="
+                      desejos.idsSalvos().has(oferta.jogoId)
+                        ? 'text-radar-green'
+                        : 'text-white/80 hover:text-radar-green'
+                    "
+                    [attr.aria-label]="
+                      desejos.idsSalvos().has(oferta.jogoId)
+                        ? 'Remover da lista de desejos'
+                        : 'Adicionar à lista de desejos'
+                    "
+                  >
+                    {{ desejos.idsSalvos().has(oferta.jogoId) ? '♥' : '♡' }}
+                  </button>
+                </div>
+                <div class="p-4">
+                  <h3 class="font-bold text-lg mb-1 truncate" [title]="oferta.titulo">
+                    {{ oferta.titulo }}
+                  </h3>
+                  <p class="text-radar-text-muted text-xs mb-4">PC</p>
+
+                  <div class="flex items-center gap-3 mb-4">
+                    @if (oferta.desconto > 0) {
+                      <span
+                        class="border border-radar-green/40 text-radar-green text-xs font-bold px-2 py-1 rounded"
+                      >
+                        −{{ oferta.desconto }}%
+                      </span>
+                      <span class="line-through text-radar-text-muted text-xs">
+                        {{ oferta.precoOriginal | currency: 'BRL' }}
+                      </span>
+                    }
+                    <span class="text-radar-green font-bold text-xl">{{
+                      oferta.preco | currency: 'BRL'
+                    }}</span>
+                  </div>
+
+                  <div class="flex justify-between items-center text-xs">
+                    <span class="text-radar-text-muted">Menor preço · {{ oferta.loja?.nome }}</span>
+                    <span class="font-bold group-hover:text-radar-green transition-colors"
+                      >Comparar ↗</span
+                    >
+                  </div>
+                </div>
+              </a>
+            } @empty {
+              <p class="col-span-full text-center text-radar-text-muted py-16">
+                Nenhuma oferta encontrada com esses filtros.
+              </p>
+            }
+          </div>
+        }
+      </section>
+    </div>
+  </form>
 </div>
