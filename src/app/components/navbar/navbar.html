@@ -1,73 +1,73 @@
-<nav
-  class="flex items-center justify-between px-8 py-4 bg-[#0D0E12] text-white border-b border-[#2A2D35] sticky top-0 z-50"
->
-  <div class="flex items-center gap-2">
-    <!-- Substitua pelo seu logotipo verde -->
-    <!-- <div class="w-6 h-6 rounded-full bg-[#CCFF00]"></div> -->
-    <img src="/6316d.svg" alt="" class="w-6 h-6" />
-    <span class="text-xl font-bold font-heading">radargamer</span>
-  </div>
+<nav class="sticky top-0 z-40 bg-radar-bg/95 backdrop-blur border-b border-radar-border">
+  <div class="max-w-7xl mx-auto px-6 h-[72px] flex items-center justify-between gap-6">
+    <div class="flex items-center gap-12 h-full">
+      <a routerLink="/home" class="flex items-center gap-2.5 text-xl font-bold">
+        <img src="/6316d.svg" alt="" class="w-8 h-8" />
+        <span>radar<span class="text-radar-green">gamer</span></span>
+      </a>
 
-  <div class="flex items-center gap-8">
-    <a
-      routerLink="/home"
-      routerLinkActive="text-[#CCFF00] border-b-2 border-[#CCFF00] pb-1"
-      [routerLinkActiveOptions]="{ exact: true }"
-      class="text-sm font-medium text-gray-400 hover:text-white transition-colors"
-    >
-      Ofertas
-    </a>
-    <a
-      routerLink="/lista-desejos"
-      routerLinkActive="text-[#CCFF00] border-b-2 border-[#CCFF00] pb-1"
-      class="text-sm font-medium text-gray-400 hover:text-white transition-colors"
-    >
-      Lista de desejos
-    </a>
-    <a
-      routerLink="/alertas"
-      routerLinkActive="text-[#CCFF00] border-b-2 border-[#CCFF00] pb-1"
-      class="text-sm font-medium text-gray-400 hover:text-white transition-colors"
-    >
-      Meus alertas
-    </a>
-  </div>
-
-  <div class="flex items-center gap-4">
-    <!-- Ícone de sino genérico -->
-    <button class="text-gray-400 hover:text-white">
-      <svg
-        xmlns="http://www.w3.org/2000/svg"
-        class="h-5 w-5"
-        fill="none"
-        viewBox="0 0 24 24"
-        stroke="currentColor"
-      >
-        <path
-          stroke-linecap="round"
-          stroke-linejoin="round"
-          stroke-width="2"
-          d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"
-        />
-      </svg>
-    </button>
-
-    <div class="flex items-center gap-2 cursor-pointer">
-      <div
-        class="w-8 h-8 rounded-full bg-gray-700 flex items-center justify-center text-xs font-bold"
-      >
-        JP
+      <div class="hidden md:flex items-center gap-8 h-full">
+        @for (link of links; track link.rota) {
+          <a
+            [routerLink]="link.rota"
+            routerLinkActive="!text-radar-green !border-radar-green"
+            class="h-full flex items-center text-sm font-medium text-radar-text-muted hover:text-white border-b-2 border-transparent transition-colors"
+          >
+            {{ link.texto }}
+          </a>
+        }
       </div>
-      <span class="text-sm font-medium">João</span>
-      <svg
-        xmlns="http://www.w3.org/2000/svg"
-        class="h-4 w-4 text-gray-400"
-        fill="none"
-        viewBox="0 0 24 24"
-        stroke="currentColor"
+    </div>
+
+    <div class="flex items-center gap-4">
+      <a
+        routerLink="/alertas"
+        class="text-radar-text-muted hover:text-white"
+        aria-label="Meus alertas"
       >
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
-      </svg>
+        <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"
+          />
+        </svg>
+      </a>
+
+      <span class="w-px h-6 bg-radar-border"></span>
+
+      <div class="relative">
+        <button
+          type="button"
+          (click)="menuAberto.set(!menuAberto())"
+          class="flex items-center gap-2"
+          [attr.aria-expanded]="menuAberto()"
+        >
+          <span
+            class="w-9 h-9 rounded-full bg-radar-surface border border-radar-border flex items-center justify-center text-xs font-bold"
+          >
+            {{ auth.iniciais() }}
+          </span>
+          <span class="text-sm font-medium">{{ auth.primeiroNome() }}</span>
+          <span class="text-radar-text-muted text-xs">▾</span>
+        </button>
+
+        @if (menuAberto()) {
+          <div class="absolute right-0 mt-3 w-56 card p-2 shadow-2xl">
+            <p class="px-3 py-2 text-xs text-radar-text-muted truncate">
+              {{ auth.usuario()?.email }}
+            </p>
+            <button
+              type="button"
+              (click)="sair()"
+              class="w-full text-left px-3 py-2 rounded-lg text-sm hover:bg-radar-bg hover:text-radar-green"
+            >
+              Sair
+            </button>
+          </div>
+        }
+      </div>
     </div>
   </div>
 </nav>
