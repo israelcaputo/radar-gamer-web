@@ -1,33 +1,76 @@
-<div class="min-h-screen flex items-center justify-center p-4">
-  <div class="max-w-md w-full bg-[#1A1D24] p-8 rounded-xl border border-[#2A2D35]">
-    <h1 class="text-2xl font-bold text-white mb-6 text-center">Entrar no Radar Gamer</h1>
-    <form class="space-y-4">
-      <div>
-        <label class="block text-sm text-gray-400 mb-1">E-mail</label>
+<app-auth-shell
+  [destaque]="['Grandes jogos.', 'Melhores escolhas.']"
+  pergunta="Novo por aqui?"
+  textoLink="Criar uma conta"
+  rotaLink="/cadastro"
+>
+  <p class="sobretitulo mb-3">Bom ter você de volta</p>
+  <h2 class="text-4xl font-extrabold mb-2">Entre no seu radar.</h2>
+  <p class="text-radar-text-muted mb-8">
+    Seus jogos favoritos e suas próximas oportunidades estão aqui.
+  </p>
+
+  <form [formGroup]="form" (ngSubmit)="entrar()" novalidate class="space-y-5">
+    <div>
+      <label for="email" class="rotulo">E-mail</label>
+      <input
+        id="email"
+        type="email"
+        formControlName="email"
+        autocomplete="email"
+        placeholder="voce@exemplo.com"
+        class="campo"
+      />
+      <app-campo-erro [controle]="form.controls.email" />
+    </div>
+
+    <div>
+      <label for="senha" class="rotulo">Senha</label>
+      <div class="relative">
         <input
-          type="email"
-          class="w-full bg-[#0D0E12] border border-[#2A2D35] rounded-lg px-4 py-2 text-white focus:outline-none focus:border-[#CCFF00]"
-          placeholder="seu@email.com"
+          id="senha"
+          [type]="senhaVisivel() ? 'text' : 'password'"
+          formControlName="senha"
+          autocomplete="current-password"
+          placeholder="Digite sua senha"
+          class="campo pr-20"
         />
+        <button
+          type="button"
+          (click)="senhaVisivel.set(!senhaVisivel())"
+          class="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-radar-text-muted hover:text-white"
+        >
+          {{ senhaVisivel() ? 'Ocultar' : 'Mostrar' }}
+        </button>
       </div>
-      <div>
-        <label class="block text-sm text-gray-400 mb-1">Senha</label>
-        <input
-          type="password"
-          class="w-full bg-[#0D0E12] border border-[#2A2D35] rounded-lg px-4 py-2 text-white focus:outline-none focus:border-[#CCFF00]"
-          placeholder="••••••••"
-        />
-      </div>
-      <button
-        type="button"
-        class="w-full bg-[#CCFF00] text-black font-semibold py-2 rounded-lg hover:bg-[#b3e600] transition-colors mt-4"
+      <app-campo-erro
+        [controle]="form.controls.senha"
+        [mensagens]="{ required: 'Informe sua senha.' }"
+      />
+    </div>
+
+    <label class="flex items-center gap-2 text-sm text-radar-text-muted cursor-pointer w-fit">
+      <input type="checkbox" formControlName="lembrar" class="w-4 h-4" />
+      Lembrar de mim
+    </label>
+
+    @if (erro()) {
+      <p
+        class="text-sm text-red-400 border border-red-500/40 bg-red-500/10 rounded-lg px-4 py-3"
+        role="alert"
       >
-        Entrar
-      </button>
-    </form>
-    <p class="text-center text-sm text-gray-400 mt-6">
-      Não tem uma conta?
-      <a routerLink="/cadastro" class="text-[#CCFF00] hover:underline">Cadastre-se</a>
-    </p>
-  </div>
-</div>
+        {{ erro() }}
+      </p>
+    }
+
+    <button type="submit" class="btn-primario w-full" [disabled]="enviando()">
+      {{ enviando() ? 'Entrando…' : '→ Entrar' }}
+    </button>
+  </form>
+
+  <p class="text-xs text-radar-text-muted mt-8 border-t border-radar-border pt-6">
+    🛡️ Não vendemos jogos. Ajudamos você a comparar preços e escolher onde comprar.
+    <br />
+    Conta de demonstração: joao&#64;radargamer.com · radar1234
+  </p>
+</app-auth-shell>
