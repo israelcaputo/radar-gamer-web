@@ -2,13 +2,22 @@ import { Injectable, inject } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { Observable, forkJoin, map, of } from 'rxjs';
 import { environment } from '../../environments/environment';
-import { CheapSharkDeal, CheapSharkDealsParams, CheapSharkStore } from '../models/cheapshark';
-import { FiltroOfertas, JogoDetalhe, Loja, Oferta, Ordenacao } from '../models/oferta';
+import {
+  CheapSharkDeal,
+  CheapSharkDealsParams,
+  CheapSharkGameLookup,
+  CheapSharkStore,
+} from '../models/cheapshark';
+import { JogoReferencia } from '../models/desejo';
+import { FiltroOfertas, JogoBusca, JogoDetalhe, Loja, Oferta, Ordenacao } from '../models/oferta';
 import { CambioService } from './cambio';
 import { CheapSharkService } from './cheapshark';
 
 /** Lojas exibidas nos filtros (IDs da CheapShark). */
 export const LOJAS_SUPORTADAS = ['1', '3', '7', '11', '15', '25'];
+
+/** Limite de IDs por requisição em GET /games?ids= */
+const IDS_POR_REQUISICAO = 25;
 
 const STEAM_CDN = 'https://shared.akamai.steamstatic.com/store_item_assets/steam/apps';
 
@@ -42,9 +51,7 @@ export class JogoService {
     { initialValue: [] as Loja[] },
   );
 
-  /**
-   * Busca ofertas e devolve uma por jogo (a mais barata entre as lojas filtradas).
-   */
+  /** Busca ofertas e devolve uma por jogo (a mais barata entre as lojas filtradas). */
   buscarOfertas(filtro: FiltroOfertas): Observable<Oferta[]> {
     if (filtro.lojas.length === 0) {
       return of([]);
@@ -72,42 +79,112 @@ export class JogoService {
       this.cheapShark.buscarJogo(jogoId),
       this.cambio.cotacao$,
       this.lojasPorId$,
+    ]).pipe(map(([jogo, cotacao, lojas]) => this.paraDetalhe(jogoId, jogo, cotacao.valor, lojas)));
+  }
+
+  /**
+   * Detalhes de vários jogos de uma vez (lista de desejos e alertas).
+   * Divide em lotes de 25 IDs, o máximo aceito pela API.
+   */
+  detalharVarios(ids: string[]): Observable<Map<string, JogoDetalhe>> {
+    const unicos = [...new Set(ids)];
+    if (unicos.length === 0) {
+      return of(new Map());
+    }
+
+    const lotes: string[][] = [];
+    for (let i = 0; i < unicos.length; i += IDS_POR_REQUISICAO) {
+      lotes.push(unicos.slice(i, i + IDS_POR_REQUISICAO));
+    }
+
+    return forkJoin([
+      forkJoin(lotes.map((lote) => this.cheapShark.buscarJogos(lote))),
+      this.cambio.cotacao$,
+      this.lojasPorId$,
     ]).pipe(
-      map(([jogo, cotacao, lojas]) => {
-        const brl = (usd: string) => this.cambio.converter(usd, cotacao.valor);
-        const appId = jogo.info.steamAppID;
-        const imagens = this.imagens(appId, jogo.info.thumb);
-
-        const ofertas: Oferta[] = jogo.deals
-          .map((d) => ({
-            dealId: d.dealID,
-            jogoId,
-            titulo: jogo.info.title,
-            loja: lojas.get(d.storeID),
-            preco: brl(d.price),
-            precoOriginal: brl(d.retailPrice),
-            desconto: Math.round(Number(d.savings)),
-            imagem: imagens.header,
-            imagemReserva: jogo.info.thumb,
-            linkLoja: this.cheapShark.linkDaOferta(d.dealID),
-          }))
-          .sort((a, b) => a.preco - b.preco);
-
-        return {
-          id: jogoId,
-          titulo: jogo.info.title,
-          steamAppId: appId,
-          capa: imagens.capa,
-          banner: imagens.header,
-          imagemReserva: jogo.info.thumb,
-          menorPrecoHistorico: {
-            preco: brl(jogo.cheapestPriceEver.price),
-            data: new Date(jogo.cheapestPriceEver.date * 1000),
-          },
-          ofertas,
-        };
+      map(([respostas, cotacao, lojas]) => {
+        const resultado = new Map<string, JogoDetalhe>();
+        for (const resposta of respostas) {
+          for (const [id, jogo] of Object.entries(resposta)) {
+            if (jogo?.info) {
+              resultado.set(id, this.paraDetalhe(id, jogo, cotacao.valor, lojas));
+            }
+          }
+        }
+        return resultado;
       }),
     );
+  }
+
+  /** Busca jogos pelo título (sugestões ao cadastrar um alerta). */
+  pesquisarTitulos(termo: string): Observable<JogoBusca[]> {
+    return forkJoin([this.cheapShark.pesquisarJogos(termo), this.cambio.cotacao$]).pipe(
+      map(([jogos, cotacao]) =>
+        jogos.map((j) => ({
+          jogoId: j.gameID,
+          titulo: j.external,
+          imagem: j.thumb,
+          menorPreco: this.cambio.converter(j.cheapest, cotacao.valor),
+        })),
+      ),
+    );
+  }
+
+  /** Dados mínimos do jogo que a lista de desejos e os alertas guardam na Web API. */
+  referencia(jogo: JogoDetalhe | Oferta): JogoReferencia {
+    return 'ofertas' in jogo
+      ? {
+          jogoId: jogo.id,
+          titulo: jogo.titulo,
+          imagem: jogo.banner,
+          imagemReserva: jogo.imagemReserva,
+        }
+      : {
+          jogoId: jogo.jogoId,
+          titulo: jogo.titulo,
+          imagem: jogo.imagem,
+          imagemReserva: jogo.imagemReserva,
+        };
+  }
+
+  private paraDetalhe(
+    jogoId: string,
+    jogo: CheapSharkGameLookup,
+    cotacao: number,
+    lojas: Map<string, Loja>,
+  ): JogoDetalhe {
+    const brl = (usd: string) => this.cambio.converter(usd, cotacao);
+    const appId = jogo.info.steamAppID;
+    const imagens = this.imagens(appId, jogo.info.thumb);
+
+    const ofertas: Oferta[] = jogo.deals
+      .map((d) => ({
+        dealId: d.dealID,
+        jogoId,
+        titulo: jogo.info.title,
+        loja: lojas.get(d.storeID),
+        preco: brl(d.price),
+        precoOriginal: brl(d.retailPrice),
+        desconto: Math.round(Number(d.savings)),
+        imagem: imagens.header,
+        imagemReserva: jogo.info.thumb,
+        linkLoja: this.cheapShark.linkDaOferta(d.dealID),
+      }))
+      .sort((a, b) => a.preco - b.preco);
+
+    return {
+      id: jogoId,
+      titulo: jogo.info.title,
+      steamAppId: appId,
+      capa: imagens.capa,
+      banner: imagens.header,
+      imagemReserva: jogo.info.thumb,
+      menorPrecoHistorico: {
+        preco: brl(jogo.cheapestPriceEver.price),
+        data: new Date(jogo.cheapestPriceEver.date * 1000),
+      },
+      ofertas,
+    };
   }
 
   /** A API devolve uma linha por loja; mantém só a mais barata de cada jogo. */

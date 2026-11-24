@@ -51,3 +51,11 @@ export interface Cotacao {
   origem: 'api' | 'reserva';
   atualizadaEm: Date;
 }
+
+/** Resultado da busca de jogos por título (usado ao cadastrar um alerta). */
+export interface JogoBusca {
+  jogoId: string;
+  titulo: string;
+  imagem: string;
+  menorPreco: number;
+}
