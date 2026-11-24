@@ -1,10 +1,26 @@
-import { Component } from '@angular/core';
-import { RouterModule } from '@angular/router';
+import { Component, inject, signal } from '@angular/core';
+import { RouterLink, RouterLinkActive } from '@angular/router';
+import { AuthService } from '../../services/auth';
 
 @Component({
-  imports: [RouterModule],
   selector: 'app-navbar',
-  styleUrl: './navbar.css',
+  imports: [RouterLink, RouterLinkActive],
   templateUrl: './navbar.html',
+  styleUrl: './navbar.css',
+  host: { '(document:keydown.escape)': 'menuAberto.set(false)' },
 })
-export class Navbar {}
+export class Navbar {
+  protected readonly auth = inject(AuthService);
+  protected readonly menuAberto = signal(false);
+
+  protected readonly links = [
+    { rota: '/home', texto: 'Ofertas' },
+    { rota: '/lista-desejos', texto: 'Lista de desejos' },
+    { rota: '/alertas', texto: 'Meus alertas' },
+  ];
+
+  protected sair(): void {
+    this.menuAberto.set(false);
+    this.auth.sair();
+  }
+}

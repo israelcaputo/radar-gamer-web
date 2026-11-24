@@ -1,111 +1,374 @@
-<div class="p-8 max-w-[1000px] mx-auto text-white relative">
-  <h1 class="text-3xl font-bold font-heading mb-8">Meus Alertas de Preço</h1>
-
-  <!-- Bloco CREATE -->
-  <div class="bg-[#1A1D24] p-6 rounded-xl border border-[#2A2D35] mb-8">
-    <h2 class="text-lg font-bold mb-4">Criar Novo Alerta</h2>
-    <div class="flex gap-4">
-      <input
-        type="text"
-        [(ngModel)]="novoJogoTitulo"
-        placeholder="Nome do Jogo"
-        class="flex-1 bg-[#0D0E12] border border-[#2A2D35] rounded-lg px-4 py-2 text-white focus:outline-none focus:border-[#CCFF00]"
-      />
-      <input
-        type="text"
-        [(ngModel)]="novoJogoPreco"
-        placeholder="Preço Alvo (Ex: R$ 50,00)"
-        class="w-1/4 bg-[#0D0E12] border border-[#2A2D35] rounded-lg px-4 py-2 text-white focus:outline-none focus:border-[#CCFF00]"
-      />
-      <button
-        (click)="adicionarAlerta()"
-        class="bg-[#CCFF00] text-black font-bold px-6 py-2 rounded-lg hover:bg-[#b3e600] transition-colors"
-      >
-        Adicionar
-      </button>
+<div class="max-w-7xl mx-auto px-6 py-8">
+  <div class="flex items-end justify-between gap-4 mb-6">
+    <div>
+      <p class="sobretitulo mb-2">O preço certo, no momento certo</p>
+      <h1 class="text-4xl font-extrabold mb-2">Meus alertas</h1>
+      <p class="text-radar-text-muted">Você define a meta. Seu radar acompanha as oportunidades.</p>
     </div>
+    <a href="#novo-alerta" class="btn-primario">+ Novo alerta</a>
   </div>
 
-  <!-- Bloco READ e DELETE -->
-  <div class="space-y-4">
-    @for (alerta of meusAlertas(); track alerta.id) {
-      <div
-        class="bg-[#1A1D24] p-4 rounded-xl border border-[#2A2D35] flex justify-between items-center"
-      >
-        <div class="flex items-center gap-4">
-          <img
-            [src]="alerta.imagem"
-            alt="Capa"
-            class="w-16 h-12 object-cover rounded border border-[#2A2D35]"
-          />
-          <div>
-            <h3 class="font-bold text-lg text-white">{{ alerta.titulo }}</h3>
-            <p class="text-sm text-gray-400">
-              Loja: {{ alerta.melhorLoja }} | Plataforma: {{ alerta.plataforma }}
-            </p>
-            <p class="text-[#CCFF00] font-semibold mt-1">
-              Avisar quando chegar a: {{ alerta.precoAtual }}
-            </p>
-          </div>
-        </div>
+  <!-- Resumo -->
+  <section class="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+    <div class="card px-6 py-5 flex items-center gap-3">
+      <span class="text-3xl font-extrabold">{{ resumo().total }}</span>
+      <span class="text-sm text-radar-text-muted">alertas cadastrados</span>
+    </div>
+    <div class="card px-6 py-5 flex items-center gap-3">
+      <span class="text-3xl font-extrabold">{{ resumo().aguardando }}</span>
+      <span class="text-sm text-radar-text-muted">ativos, aguardando oferta</span>
+    </div>
+    <div class="card px-6 py-5 flex items-center gap-3">
+      <span class="text-3xl font-extrabold text-radar-green">{{ resumo().metasAtingidas }}</span>
+      <span class="text-sm text-radar-text-muted">metas atingidas</span>
+    </div>
+    <div class="card px-6 py-5 flex items-center gap-3">
+      <span class="text-3xl font-extrabold">{{ resumo().pausados }}</span>
+      <span class="text-sm text-radar-text-muted">pausados por você</span>
+    </div>
+  </section>
 
-        <div class="flex items-center gap-4">
-          <!-- Aciona a abertura do Modal passando o objeto atual -->
-          <button
-            (click)="abrirModalEditar(alerta)"
-            class="text-gray-300 hover:text-white font-medium text-sm transition-colors px-3 py-1 rounded bg-[#2A2D35] hover:bg-[#353842]"
-          >
-            Editar Preço
-          </button>
+  <!-- Pesquisa e filtro -->
+  <form
+    [formGroup]="filtros"
+    (ngSubmit)="$event.preventDefault()"
+    class="flex flex-wrap gap-4 mb-6"
+  >
+    <div class="flex-1 min-w-64">
+      <input
+        type="search"
+        formControlName="busca"
+        placeholder="Buscar alerta por nome do jogo"
+        aria-label="Buscar alerta"
+        class="campo"
+      />
+      <app-campo-erro [controle]="filtros.controls.busca" />
+    </div>
+    <label class="flex items-center gap-2 text-sm self-start">
+      <span class="text-radar-text-muted">Status:</span>
+      <select formControlName="status" class="campo w-auto py-2.5 cursor-pointer">
+        <option value="todos">Todos</option>
+        <option value="ativo">Ativos</option>
+        <option value="meta-atingida">Meta atingida</option>
+        <option value="pausado">Pausados</option>
+      </select>
+    </label>
+  </form>
 
-          <button
-            (click)="removerAlerta(alerta.id)"
-            class="text-red-500 hover:text-red-400 font-medium text-sm transition-colors bg-red-500/10 px-3 py-1 rounded"
-          >
-            Excluir
-          </button>
-        </div>
-      </div>
-    } @empty {
-      <div class="text-center py-10 bg-[#1A1D24] rounded-xl border border-[#2A2D35]">
-        <p class="text-gray-400">Você ainda não possui nenhum alerta configurado.</p>
-      </div>
-    }
-  </div>
-
-  <!-- MODAL DE EDIÇÃO -->
-  @if (idEmEdicao() !== null) {
-    <div class="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm">
-      <div class="bg-[#1A1D24] w-full max-w-md p-6 rounded-xl border border-[#2A2D35] shadow-2xl">
-        <h3 class="text-xl font-bold text-white mb-2">Editar Preço-Alvo</h3>
-        <p class="text-gray-400 text-sm mb-6">
-          Defina o novo valor desejado para receber notificações.
-        </p>
-
-        <div class="mb-6">
-          <label class="block text-sm font-medium text-gray-400 mb-2">Novo Preço</label>
-          <input
-            type="text"
-            [(ngModel)]="precoEdicao"
-            class="w-full bg-[#0D0E12] border border-[#2A2D35] rounded-lg px-4 py-3 text-white focus:outline-none focus:border-[#CCFF00]"
-          />
-        </div>
-
-        <div class="flex justify-end gap-3">
-          <button
-            (click)="fecharModal()"
-            class="px-5 py-2 text-gray-300 hover:text-white transition-colors"
-          >
-            Cancelar
-          </button>
-          <button
-            (click)="salvarEdicao()"
-            class="bg-[#CCFF00] text-black font-bold px-5 py-2 rounded-lg hover:bg-[#b3e600] transition-colors"
-          >
-            Salvar Alterações
-          </button>
-        </div>
-      </div>
+  @if (aviso(); as a) {
+    <div
+      class="border text-sm rounded-lg px-4 py-3 mb-6 flex justify-between gap-4"
+      [class]="
+        a.erro
+          ? 'border-red-500/40 bg-red-500/10 text-red-300'
+          : 'border-radar-green/40 bg-radar-green/10 text-radar-green'
+      "
+      role="status"
+    >
+      {{ a.texto }}
+      <button type="button" (click)="aviso.set(null)" aria-label="Fechar">✕</button>
     </div>
   }
+
+  <div class="flex flex-col lg:flex-row gap-6 items-start">
+    <!-- Lista de alertas -->
+    <section class="flex-1 min-w-0 w-full">
+      <div class="flex justify-between text-sm mb-3">
+        <span class="font-bold">{{ itensFiltrados().length }} alertas encontrados</span>
+        @if (precos.isLoading()) {
+          <span class="text-xs text-radar-text-muted">Atualizando preços…</span>
+        }
+      </div>
+
+      @if (dados.error()) {
+        <div class="card p-8 text-center">
+          <p class="mb-4">{{ mensagemErro(dados.error()) }}</p>
+          <button type="button" class="btn-secundario" (click)="dados.reload()">
+            Tentar de novo
+          </button>
+        </div>
+      } @else if (dados.isLoading()) {
+        @for (i of [1, 2]; track i) {
+          <div class="card h-40 mb-4 animate-pulse"></div>
+        }
+      } @else {
+        <div class="space-y-4">
+          @for (item of itensFiltrados(); track item.alerta.id) {
+            @let alerta = item.alerta;
+            <article
+              class="card p-5"
+              [class]="item.status === 'meta-atingida' ? '!border-radar-green/60' : ''"
+              [class.ring-1]="editandoId() === alerta.id"
+              [class.ring-radar-green]="editandoId() === alerta.id"
+            >
+              <div class="flex flex-wrap items-start gap-5 pb-4 border-b border-radar-border">
+                <img
+                  [src]="alerta.imagem"
+                  [appImagemReserva]="alerta.imagemReserva"
+                  [alt]="alerta.titulo"
+                  class="w-28 h-16 object-cover rounded-lg bg-radar-bg"
+                />
+                <div class="flex-1 min-w-40">
+                  <a
+                    [routerLink]="['/detalhes', alerta.jogoId]"
+                    class="text-xl font-bold hover:text-radar-green"
+                  >
+                    {{ alerta.titulo }}
+                  </a>
+                  <p class="text-xs text-radar-text-muted mt-1 mb-2">
+                    PC ·
+                    {{
+                      alerta.lojaId
+                        ? 'Só ' + (item.oferta?.loja?.nome ?? 'uma loja')
+                        : 'Todas as lojas'
+                    }}
+                  </p>
+                  <div class="flex items-center gap-2">
+                    <span
+                      [class]="
+                        item.status === 'pausado' ? 'selo border-radar-border' : 'selo-verde'
+                      "
+                    >
+                      {{ rotulosStatus[item.status] }}
+                    </span>
+                    <span class="text-xs text-radar-text-muted">
+                      {{
+                        alerta.notificarEmail && alerta.ativo
+                          ? 'Notificação por e-mail'
+                          : 'Sem notificações'
+                      }}
+                    </span>
+                  </div>
+                </div>
+                <div class="flex gap-8">
+                  <div>
+                    <p class="text-[10px] text-radar-text-muted uppercase mb-1">Seu preço-alvo</p>
+                    <p class="text-2xl font-bold">{{ alerta.precoAlvo | currency: 'BRL' }}</p>
+                  </div>
+                  <div>
+                    <p class="text-[10px] text-radar-text-muted uppercase mb-1">Preço atual</p>
+                    <p
+                      class="text-2xl font-bold"
+                      [class.text-radar-green]="item.status === 'meta-atingida'"
+                    >
+                      {{ item.oferta ? (item.oferta.preco | currency: 'BRL') : '—' }}
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              <div class="flex flex-wrap items-center justify-between gap-3 pt-4 text-sm">
+                <p
+                  class="text-xs"
+                  [class]="
+                    item.status === 'meta-atingida' ? 'text-radar-green' : 'text-radar-text-muted'
+                  "
+                >
+                  @switch (item.status) {
+                    @case ('meta-atingida') {
+                      Seu alvo foi alcançado. Confira a oferta na {{ item.oferta?.loja?.nome }}.
+                    }
+                    @case ('pausado') {
+                      Acompanhamento pausado por você.
+                    }
+                    @default {
+                      Aguardando uma oferta de até {{ alerta.precoAlvo | currency: 'BRL' }}.
+                    }
+                  }
+                </p>
+
+                @if (removendoId() === alerta.id) {
+                  <div class="flex items-center gap-3">
+                    <span class="text-red-300">Remover este alerta?</span>
+                    <button
+                      type="button"
+                      class="font-bold text-red-400 hover:underline"
+                      (click)="remover(alerta)"
+                    >
+                      Sim, remover
+                    </button>
+                    <button
+                      type="button"
+                      class="font-bold hover:underline"
+                      (click)="removendoId.set(null)"
+                    >
+                      Cancelar
+                    </button>
+                  </div>
+                } @else {
+                  <div class="flex items-center gap-6 font-bold">
+                    <button
+                      type="button"
+                      class="hover:text-radar-green"
+                      (click)="editandoId.set(alerta.id)"
+                    >
+                      ✎ Editar
+                    </button>
+                    <button
+                      type="button"
+                      class="hover:text-radar-green"
+                      (click)="alternarAtivo(alerta)"
+                    >
+                      {{ alerta.ativo ? '⏸ Pausar' : '▶ Retomar' }}
+                    </button>
+                    <button
+                      type="button"
+                      class="hover:text-red-400"
+                      (click)="removendoId.set(alerta.id)"
+                    >
+                      🗑 Remover
+                    </button>
+                  </div>
+                }
+              </div>
+            </article>
+          } @empty {
+            <div class="card p-10 text-center text-radar-text-muted">
+              {{
+                itens().length
+                  ? 'Nenhum alerta corresponde aos filtros.'
+                  : 'Você ainda não tem alertas. Crie o primeiro ao lado.'
+              }}
+            </div>
+          }
+
+          @if (primeiraMetaAtingida(); as meta) {
+            <div
+              class="rounded-xl bg-radar-green/10 border border-radar-green/30 p-5 flex items-center justify-between gap-4"
+            >
+              <div>
+                <p class="font-bold">{{ meta.alerta.titulo }} chegou ao seu preço.</p>
+                <p class="text-sm text-radar-text-muted">
+                  {{ meta.oferta?.preco | currency: 'BRL' }} na {{ meta.oferta?.loja?.nome }} · PC
+                </p>
+              </div>
+              <a [href]="meta.oferta?.linkLoja" target="_blank" rel="noopener" class="btn-primario"
+                >↗ Ver oferta</a
+              >
+            </div>
+          }
+        </div>
+      }
+    </section>
+
+    <!-- Painéis laterais -->
+    <aside class="w-full lg:w-[400px] shrink-0 space-y-6">
+      @if (emEdicao(); as alerta) {
+        <section class="card p-6 !border-radar-green/50">
+          <div class="flex justify-between items-start mb-4">
+            <h2 class="text-xl font-bold">Editar alerta</h2>
+            <button
+              type="button"
+              (click)="editandoId.set(null)"
+              aria-label="Fechar edição"
+              class="text-radar-text-muted hover:text-white"
+            >
+              ✕
+            </button>
+          </div>
+          <p class="flex items-center gap-2 font-bold mb-5">
+            <span class="selo-verde">PC</span>
+            {{ alerta.titulo }}
+          </p>
+          <app-alerta-form
+            [lojas]="lojasEmEdicao()"
+            [valor]="alerta"
+            [precoAtual]="precos.value().get(alerta.jogoId)?.ofertas?.[0]?.preco"
+            [mostrarAtivo]="true"
+            [mostrarCancelar]="true"
+            textoBotao="Salvar alterações"
+            [enviando]="salvando()"
+            (salvar)="salvarEdicao($event)"
+            (cancelar)="editandoId.set(null)"
+          />
+        </section>
+      }
+
+      <section id="novo-alerta" class="card p-6 scroll-mt-24">
+        <h2 class="text-xl font-bold mb-5">Cadastrar novo alerta</h2>
+
+        <label for="busca-jogo" class="rotulo">Jogo</label>
+        @if (jogoSelecionado(); as jogo) {
+          <div class="flex items-center gap-3 campo">
+            <img [src]="jogo.imagem" alt="" class="w-14 h-7 object-cover rounded" />
+            <span class="flex-1 truncate font-medium">{{ jogo.titulo }}</span>
+            <button
+              type="button"
+              (click)="trocarJogo()"
+              class="text-xs text-radar-green hover:underline"
+            >
+              Trocar
+            </button>
+          </div>
+
+          @if (jaTemAlerta(jogo.jogoId)) {
+            <p class="text-xs text-red-400 mt-2">
+              Você já tem um alerta para este jogo. Edite o existente na lista.
+            </p>
+          } @else if (detalheSelecionado.isLoading()) {
+            <p class="text-xs text-radar-text-muted mt-3">Consultando preços…</p>
+          } @else if (detalheSelecionado.error()) {
+            <p class="text-xs text-red-400 mt-3">{{ mensagemErro(detalheSelecionado.error()) }}</p>
+          } @else if (detalheSelecionado.value(); as detalhe) {
+            <p class="text-xs text-radar-text-muted mt-2 mb-5">
+              Menor preço hoje: {{ detalhe.ofertas[0]?.preco | currency: 'BRL' }} na
+              {{ detalhe.ofertas[0]?.loja?.nome }}
+            </p>
+            <app-alerta-form
+              [lojas]="lojasSelecionado()"
+              [sugestao]="sugestaoSelecionado()"
+              [precoAtual]="detalhe.ofertas[0]?.preco"
+              textoBotao="+ Cadastrar alerta"
+              [enviando]="criando()"
+              (salvar)="criar($event)"
+            />
+          }
+        } @else {
+          <div class="relative">
+            <input
+              id="busca-jogo"
+              type="search"
+              [formControl]="buscaJogo"
+              placeholder="Buscar um jogo para PC"
+              autocomplete="off"
+              class="campo"
+            />
+            <app-campo-erro
+              [controle]="buscaJogo"
+              [mensagens]="{ minlength: 'Digite pelo menos 2 letras.' }"
+            />
+
+            @if (buscandoJogos()) {
+              <p class="text-xs text-radar-text-muted mt-2">Buscando…</p>
+            }
+            @if (sugestoes().length) {
+              <ul
+                class="absolute z-10 left-0 right-0 mt-2 card p-1 max-h-72 overflow-y-auto shadow-2xl"
+              >
+                @for (jogo of sugestoes(); track jogo.jogoId) {
+                  <li>
+                    <button
+                      type="button"
+                      (click)="escolherJogo(jogo)"
+                      class="w-full flex items-center gap-3 p-2 rounded-lg hover:bg-radar-bg text-left"
+                    >
+                      <img [src]="jogo.imagem" alt="" class="w-16 h-8 object-cover rounded" />
+                      <span class="flex-1 text-sm truncate">{{ jogo.titulo }}</span>
+                      <span class="text-xs text-radar-green whitespace-nowrap">{{
+                        jogo.menorPreco | currency: 'BRL'
+                      }}</span>
+                    </button>
+                  </li>
+                }
+              </ul>
+            }
+          </div>
+          <p class="text-xs text-radar-text-muted mt-3">
+            Escolha o jogo para definir o preço-alvo. Lojas compatíveis · aviso por e-mail · você
+            pode editar depois.
+          </p>
+        }
+      </section>
+    </aside>
+  </div>
 </div>

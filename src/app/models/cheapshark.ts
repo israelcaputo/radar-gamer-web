@@ -45,6 +45,19 @@ export interface CheapSharkGameLookup {
   }[];
 }
 
+/** GET /games?ids=1,2,3 — objeto com uma entrada por ID */
+export type CheapSharkGameLookupLote = Record<string, CheapSharkGameLookup>;
+
+/** GET /games?title={titulo} */
+export interface CheapSharkGameSearch {
+  gameID: string;
+  steamAppID: string | null;
+  cheapest: string;
+  cheapestDealID: string;
+  external: string;
+  thumb: string;
+}
+
 /** GET /stores */
 export interface CheapSharkStore {
   storeID: string;

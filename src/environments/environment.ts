@@ -1,4 +1,6 @@
 export const environment = {
+  /** Web API local (json-server) com usuários, lista de desejos e alertas. Rode: pnpm api */
+  apiUrl: 'http://localhost:3000',
   /** API pública de preços de jogos para PC (valores em dólar). */
   cheapSharkUrl: 'https://www.cheapshark.com/api/1.0',
   /** Página de redirecionamento da CheapShark para a loja da oferta. */

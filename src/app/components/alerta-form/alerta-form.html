@@ -1,0 +1,63 @@
+<form [formGroup]="form" (ngSubmit)="enviar()" novalidate class="space-y-4">
+  <div>
+    <label for="preco-alvo" class="rotulo">Preço-alvo (R$)</label>
+    <input
+      id="preco-alvo"
+      type="number"
+      inputmode="decimal"
+      step="0.01"
+      min="0.01"
+      formControlName="precoAlvo"
+      placeholder="0,00"
+      class="campo"
+    />
+    <app-campo-erro
+      [controle]="form.controls.precoAlvo"
+      [mensagens]="{
+        required: 'Informe quanto você quer pagar.',
+        min: 'O preço-alvo deve ser maior que zero.',
+      }"
+    />
+    @let dif = diferenca();
+    @if (dif !== null && form.controls.precoAlvo.valid) {
+      @if (dif > 0) {
+        <p class="text-xs text-radar-text-muted mt-1.5">
+          {{ dif | currency: 'BRL' }} abaixo do menor preço atual.
+        </p>
+      } @else {
+        <p class="text-xs text-radar-green mt-1.5">Esse valor já está disponível hoje.</p>
+      }
+    }
+  </div>
+
+  <div>
+    <label for="loja" class="rotulo">Lojas acompanhadas</label>
+    <select id="loja" formControlName="lojaId" class="campo cursor-pointer">
+      <option value="">Todas as lojas compatíveis ({{ lojas().length }})</option>
+      @for (loja of lojas(); track loja.id) {
+        <option [value]="loja.id">Somente {{ loja.nome }}</option>
+      }
+    </select>
+  </div>
+
+  <label class="flex items-center gap-2 text-sm text-radar-text-muted cursor-pointer w-fit">
+    <input type="checkbox" formControlName="notificarEmail" class="w-4 h-4" />
+    Receber aviso por e-mail
+  </label>
+
+  @if (mostrarAtivo()) {
+    <label class="flex items-center justify-between text-sm cursor-pointer">
+      Alerta ativo
+      <input type="checkbox" formControlName="ativo" class="w-4 h-4" />
+    </label>
+  }
+
+  <div class="flex gap-3">
+    @if (mostrarCancelar()) {
+      <button type="button" class="btn-secundario" (click)="cancelar.emit()">Cancelar</button>
+    }
+    <button type="submit" class="btn-primario flex-1" [disabled]="enviando()">
+      {{ enviando() ? 'Salvando…' : textoBotao() }}
+    </button>
+  </div>
+</form>

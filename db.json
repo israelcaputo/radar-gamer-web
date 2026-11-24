@@ -1,0 +1,12 @@
+{
+  "usuarios": [
+    {
+      "id": "usuario-demo",
+      "nome": "João Pereira",
+      "email": "joao@radargamer.com",
+      "senha": "radar1234"
+    }
+  ],
+  "desejos": [],
+  "alertas": []
+}

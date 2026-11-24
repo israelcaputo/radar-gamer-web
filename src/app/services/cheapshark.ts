@@ -6,6 +6,8 @@ import {
   CheapSharkDeal,
   CheapSharkDealsParams,
   CheapSharkGameLookup,
+  CheapSharkGameLookupLote,
+  CheapSharkGameSearch,
   CheapSharkStore,
 } from '../models/cheapshark';
 
@@ -35,6 +37,19 @@ export class CheapSharkService {
 
   buscarJogo(id: string): Observable<CheapSharkGameLookup> {
     return this.http.get<CheapSharkGameLookup>(`${this.baseUrl}/games`, { params: { id } });
+  }
+
+  /** Consulta vários jogos de uma vez (a API aceita até 25 IDs por requisição). */
+  buscarJogos(ids: string[]): Observable<CheapSharkGameLookupLote> {
+    return this.http.get<CheapSharkGameLookupLote>(`${this.baseUrl}/games`, {
+      params: { ids: ids.join(',') },
+    });
+  }
+
+  pesquisarJogos(titulo: string, limite = 8): Observable<CheapSharkGameSearch[]> {
+    return this.http.get<CheapSharkGameSearch[]>(`${this.baseUrl}/games`, {
+      params: { title: titulo, limit: limite },
+    });
   }
 
   listarLojas(): Observable<CheapSharkStore[]> {

@@ -1,0 +1,65 @@
+<div class="min-h-screen grid lg:grid-cols-2">
+  <!-- Lado da imagem -->
+  <section class="relative hidden lg:flex flex-col justify-between p-12 overflow-hidden">
+    @if (!imagemFalhou()) {
+      <img
+        [src]="imagemFundo"
+        alt=""
+        class="absolute inset-0 w-full h-full object-cover"
+        (error)="imagemFalhou.set(true)"
+      />
+    }
+    <div
+      class="absolute inset-0 bg-gradient-to-t from-radar-bg via-radar-bg/60 to-radar-bg/20"
+    ></div>
+
+    <a routerLink="/login" class="relative flex items-center gap-3 text-2xl font-bold">
+      <img src="/6316d.svg" alt="" class="w-9 h-9" />
+      <span>radar<span class="text-radar-green">gamer</span></span>
+    </a>
+
+    <div class="relative max-w-xl">
+      <p class="sobretitulo mb-4">Seu próximo jogo. No seu preço.</p>
+      <h1 class="text-5xl font-extrabold leading-tight mb-5">
+        @for (linha of destaque(); track $index) {
+          <span class="block">{{ linha }}</span>
+        }
+      </h1>
+      <p class="text-lg text-white/80 mb-8">
+        Compare lojas, acompanhe seus favoritos e encontre o momento certo para jogar.
+      </p>
+      <div class="flex flex-wrap gap-4">
+        <span class="selo-verde bg-radar-bg/60">Compare preços</span>
+        <span class="selo-verde bg-radar-bg/60">Crie alertas</span>
+        <span class="selo-verde bg-radar-bg/60">Economize</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- Lado do formulário -->
+  <section class="flex flex-col p-8 lg:p-12">
+    <header class="flex items-center justify-between lg:justify-end gap-4">
+      <a routerLink="/login" class="lg:hidden flex items-center gap-2 font-bold">
+        <img src="/6316d.svg" alt="" class="w-7 h-7" />
+        radar<span class="text-radar-green -ml-2">gamer</span>
+      </a>
+      <div class="flex items-center gap-3">
+        <span class="text-sm text-radar-text-muted hidden sm:inline">{{ pergunta() }}</span>
+        <a [routerLink]="rotaLink()" class="btn-secundario py-2.5 text-sm bg-radar-surface">{{
+          textoLink()
+        }}</a>
+      </div>
+    </header>
+
+    <main class="flex-1 flex items-center justify-center py-10">
+      <div class="w-full max-w-md">
+        <ng-content />
+      </div>
+    </main>
+
+    <footer class="flex justify-between text-xs text-radar-text-muted">
+      <span>© {{ anoAtual }} Radar Gamer</span>
+      <span>Projeto acadêmico · FUMEC</span>
+    </footer>
+  </section>
+</div>
